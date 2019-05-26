@@ -1,6 +1,7 @@
 rePhylo: Re-investigating and improving phylogenies
 ================
 
+<!-- README.md is generated from README.Rmd. -->
 ![](README_figs/README-figure-1.png)
 
 Overview

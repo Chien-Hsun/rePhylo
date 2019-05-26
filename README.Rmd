@@ -1,7 +1,8 @@
 ---
 title: 'rePhylo: Re-investigating and improving phylogenies'
-output: github_document
+output: rmarkdown::github_document
 ---
+<!-- README.md is generated from README.Rmd. -->
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, collapse=TRUE, fig.path = "README_figs/README-")
