@@ -1,0 +1,19 @@
+Package: rePhylo
+Type: Package
+Title: Re-investigating and Improving Phylogenies
+Version: 0.1.0
+Authors@R: c(person("Chien-Hsun", "Huang", email = "chhuang@gmail.com", role = c("cre","aut")),
+    person("Wen-Yu", "Kuo", role = "aut"))
+Author: Chien-Hsun Huang [aut, cre], 
+    Wen-Yu Kuo [aut]
+Maintainer: Chien-Hsun Huang <chhuang1981@gmail.com>
+Depends: R (>= 3.3.0)
+Imports: ape (>= 5.0), stats, utils, methods, grDevices, graphics, phangorn, ggplot2, RColorBrewer
+Description: This package aims to provide a phylogenetic methods to filter out potential 
+    paralogs or sequences with misleading signals by 
+    Use four spaces when indenting paragraphs within the Description.
+URL: 
+License: GPL (>=2)
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.0.1
