@@ -1,10 +1,10 @@
 ---
 title: 'rePhylo: Re-investigating and improving phylogenies'
-output: html_document
+output: github_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, collapse=TRUE, fig.path = "README_figs/README-")
 ```
 
 ```{r cover, include = FALSE, echo = FALSE}
@@ -64,7 +64,7 @@ ref <- Brassidata$ref
 #### Method 2
 
 ```{r emthod2}
-#taxa <- read.table("taxaTable.txt", as.is = TRUE, header = 1)
+
 head(taxa)
 ```
 
