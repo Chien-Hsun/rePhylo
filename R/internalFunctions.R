@@ -424,7 +424,10 @@ select.backbone <- function(tre, mrcalist){
 .matchTips <- function(zz, refTips, setBP, reftips){
 
   # first root the test tree based on refTips
-  zz <- root.dist(z = zz, tar = refTips)
+  isroot<-is.rooted(zz)
+  if(!isroot){
+    zz <- root.dist(z = zz, tar = refTips)
+  }
 
   if(is.null(zz)){
 
@@ -555,42 +558,42 @@ root.dist<-function(z, tar, bp = FALSE){
   rt<-z
 
   if(inherits(tar,"character"))
-    g<-which(rt$tip.label %in% tar)
+    tartip<-which(rt$tip.label %in% tar)
   if(inherits(tar,"numeric"))
-    g<-tar
-  # now "g" is the number id of target tips
+    tartip<-tar
+  # now "tartip" is the number id of target tips
 
   dd<-ape::dist.nodes(x = rt)
   dd2<-NULL
-  if(length(g) == length(rt$tip.label)){
+  if(length(tartip) == length(rt$tip.label)){
     # indicates all tips are as one group
     # don't need to do rooting
     return(rt)
   }
 
-  if(length(g) == (length(rt$tip.label)-1)){
+  if(length(tartip) == (length(rt$tip.label)-1)){
     # there is only one tip not in the group
     # so just root with this tip
-    ww2<-c(1:length(rt$tip.label))[-g]
+    ww2<-c(1:length(rt$tip.label))[-tartip]
     dd2<-dd[ww2,]
     dd2<-data.frame(dd2)
-  } else if(length(g) > 0 & length(g) != 1) {
-    tt<-rt$tip.label[g]
-    dd2<-dd[,g]
-    dd2<-dd2[-g,]
+  } else if(length(tartip) > 0 & length(tartip) != 1) {
+    tt<-rt$tip.label[tartip]
+    dd2<-dd[,tartip]
+    dd2<-dd2[-tartip,]
 
     max2<-apply(dd2,2,max);max2
     w2<-lapply(c(1:ncol(dd2)),function(x) which(dd2[,x] == max2[x]));w2
     ww2<-as.numeric(unlist(lapply(w2,names)));ww2
-    ww2<-ww2[!duplicated(ww2)]
-  } else if(length(g) == 1) {
-    tt<-rt$tip.label[g]
-    dd2<-dd[-g,]
-    dd2<-dd2[,g]
+    ww2<-ww2[!duplicated(ww2)][1]
+  } else if(length(tartip) == 1) {
+    tt<-rt$tip.label[tartip]
+    dd2<-dd[-tartip,]
+    dd2<-dd2[,tartip]
 
     w2<-which(dd2 == max(dd2));w2
     #    w2<-lapply(c(1:ncol(dd2)),function(x) which(dd2[,x] == max2[x]));w2
-    ww2<-as.numeric(names(w2));ww2
+    ww2<-as.numeric(names(w2))[1];ww2
     #    ww2<-ww2[!duplicated(ww2)]
   }
 
@@ -612,8 +615,10 @@ root.dist<-function(z, tar, bp = FALSE){
   rr <- phangorn::getRoot(rt)
   rr <- phangorn::Descendants(x = rt, node = rr, type = "children")
   rr <- rr[rr <= length(rt$tip.label)]
-  if(root == rt$tip.label[rr] & bp){
-    return(rt)
+  if(length(rr) > 0){
+    if(root == rt$tip.label[rr] & bp){
+      return(rt)
+    }
   }
   rrt <- ape::root.phylo(phy = rt, outgroup = root,
                          resolve.root = TRUE, edgelabel = TRUE)

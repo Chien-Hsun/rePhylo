@@ -42,7 +42,7 @@ plot.concor <- function(x, levelcol = NULL, thres = NULL, type = c("percent", "c
   if(!inherits(x, "concor"))
     stop("x must be an object of class \"concor\".")
 
-  tree <- x$refTree
+  tree <- x$tree
   datas <- x$data
 
   type <- match.arg(type, choices = c("percent", "count"), several.ok = FALSE)
@@ -123,9 +123,12 @@ plot.concor <- function(x, levelcol = NULL, thres = NULL, type = c("percent", "c
     pthres <- NULL
     for(t in 1:length(thres)){
       cthres <- thres[t]
-      if(is.null(pthres)) nt <- data[data[ ,2] >= cthres, ]
-      else nt <- data[data[ ,2] >= cthres & data[ ,2] < pthres, ]
-
+      if(is.null(pthres)){
+        nt <- data[data[ ,2] >= cthres, ]
+      } else {
+        nt <- data[data[ ,2] >= cthres & data[ ,2] < pthres, ]
+      } 
+      
       if(inherits(nt, "numeric")){
         nt <- t(as.matrix(nt))
       }
@@ -139,8 +142,7 @@ plot.concor <- function(x, levelcol = NULL, thres = NULL, type = c("percent", "c
     cthres <- 0
     if(is.null(pthres)){
       nt <- data[data[ ,2] >= cthres, ]
-    }
-    else {
+    } else {
       nt <- data[data[ ,2] >= cthres & data[ ,2] < pthres, ]
     }
 

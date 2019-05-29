@@ -109,7 +109,7 @@ cladeFilter <- function(trees, taxa, level = NULL, write.table = TRUE){
   g <- vector("list", length(const))
   for(i in 1:length(const)){
     name <- const[i]
-    grouping <- taxa[taxa[ ,2] == name,1]
+    grouping <- as.character(taxa[taxa[ ,2] == name,1])
     grouping <- data.frame(grouping, stringsAsFactors = FALSE)
     r <- list(grouping = grouping, name = name)
     g[[i]] <- r
