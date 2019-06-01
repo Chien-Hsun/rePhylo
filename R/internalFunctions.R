@@ -242,8 +242,12 @@ select.backbone <- function(tre, mrcalist){
   colnames(mat) <- c("nodeID", "bp")
   mat[ ,1] <- as.numeric(allnodes)
   bp <- z$node.label
-  bp <- bp[-1]
-  mat[ ,2] <- as.numeric(bp)
+  if(is.null(bp)){
+    mat[ ,2] <- NA
+  } else {
+    bp <- bp[-1]
+    mat[ ,2] <- as.numeric(bp)
+  }
 
   mat <- mat[mat[ ,1] %in% nodes, ]
 
