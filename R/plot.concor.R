@@ -3,7 +3,7 @@
 #' @description This function plot the \code{ref} tree with the percents or counts of
 #' concordances as node labels.
 #'
-#' @param x an object from "\code{concor.node}".
+#' @param x an object from "\code{concor}".
 #' @param levelcol a character vector specifying the colors for node labels showing different
 #'     levels of concordances. Defaults as \code{NULL}.
 #' @param thres a numeric vector specifying the levels for node labels to be plotted with
@@ -42,7 +42,7 @@ plot.concor <- function(x, levelcol = NULL, thres = NULL, type = c("percent", "c
   if(!inherits(x, "concor"))
     stop("x must be an object of class \"concor\".")
 
-  tree <- x$tree
+  tree <- x$refTree
   datas <- x$data
 
   type <- match.arg(type, choices = c("percent", "count"), several.ok = FALSE)

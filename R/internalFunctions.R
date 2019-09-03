@@ -567,6 +567,7 @@ root.dist<-function(z, tar, bp = FALSE){
     tartip<-tar
   # now "tartip" is the number id of target tips
 
+#  dd<-ape::cophenetic.phylo(x = rt)
   dd<-ape::dist.nodes(x = rt)
   dd2<-NULL
   if(length(tartip) == length(rt$tip.label)){
@@ -583,8 +584,8 @@ root.dist<-function(z, tar, bp = FALSE){
     dd2<-data.frame(dd2)
   } else if(length(tartip) > 0 & length(tartip) != 1) {
     tt<-rt$tip.label[tartip]
-    dd2<-dd[,tartip]
-    dd2<-dd2[-tartip,]
+    dd2<-dd[,tartip];ncol(dd2);nrow(dd2)
+    dd2<-dd2[-tartip,];ncol(dd2);nrow(dd2)
 
     max2<-apply(dd2,2,max);max2
     w2<-lapply(c(1:ncol(dd2)),function(x) which(dd2[,x] == max2[x]));w2
@@ -606,14 +607,19 @@ root.dist<-function(z, tar, bp = FALSE){
     return(NULL)
   }
 
-  if(length(ww2) == 1){
-    root<-rt$tip.label[ww2]
+  if(ww2 > length(rt$tip.label)){ # is an internal node (from dist.nodes)
+    rt2<-ape::extract.clade(phy = rt, node = ww2)
+    root<-rt2$tip.label
   } else {
-    dd3<-dd2[ww2,]
-    w3<-apply(dd3,1,sum)
-    ww3<-which(w3 == max(w3))
-    ww3<-as.numeric(names(ww3))
-    root<-rt$tip.label[ww3]
+    if(length(ww2) == 1){
+      root<-rt$tip.label[ww2]
+    } else {
+      dd3<-dd2[ww2,]
+      w3<-apply(dd3,1,sum)
+      ww3<-which(w3 == max(w3))
+      ww3<-as.numeric(names(ww3))
+      root<-rt$tip.label[ww3]
+    }
   }
 
   rr <- phangorn::getRoot(rt)
