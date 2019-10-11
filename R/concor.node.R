@@ -258,11 +258,11 @@ concor.node <- function(ref, trees, bp = 0, getTreeNames = FALSE, node = NULL){
   }
 
   if(getTreeNames && unresolve.ref)
-    rdata <- list(tree = ref, data = data, conTrees = conTreesl, unresolve.ref = unref)
+    rdata <- list(refTree = ref, data = data, conTrees = conTreesl, unresolve.ref = unref)
   if(getTreeNames && !unresolve.ref)
-    rdata <- list(tree = ref, data = data, conTrees = conTreesl)
+    rdata <- list(refTree = ref, data = data, conTrees = conTreesl)
   if(!getTreeNames && unresolve.ref)
-    rdata <- list(tree = ref, data = data, unresolve.ref = unref)
+    rdata <- list(refTree = ref, data = data, unresolve.ref = unref)
   if(!getTreeNames && !unresolve.ref)
     rdata <- list(refTree = ref, data = data)
 
