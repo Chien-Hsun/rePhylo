@@ -14,7 +14,7 @@ require(rePhylo)
 
 ```{r figure, echo = FALSE}
 barc<-readRDS("data/barplotMulticf.rds")
-plot(barc$groupings)
+print(barc$groupings)
 ```
 
 

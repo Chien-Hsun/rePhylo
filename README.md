@@ -2,27 +2,33 @@ rePhylo: Re-investigating and improving phylogenies
 ================
 
 <!-- README.md is generated from README.Rmd. -->
-![](README_figs/README-figure-1.png)
 
-Overview
---------
+![](README_figs/README-figure-1.png)<!-- -->
 
-This package is to improve phylogenies based on phylogenies. One of the main function is to select potential paralogs by given groupings / constraints, and the users can perform another turn of phylogenetic reconstructions for an improved phylogeny.
+## Overview
 
-Description and notes
----------------------
+This package is to improve phylogenies based on phylogenies. One of the
+main function is to select potential paralogs by given groupings /
+constraints, and the users can perform another turn of phylogenetic
+reconstructions for an improved phylogeny.
 
-`cladeFilter` reports tips as potential paralogs that violate the groupings provided in `taxa` for each gene tree of `trees`. Users can provide `taxa` directly, or generate one by `concor.node` and `createGrouping`. **IMPORTANT NOTE:** The grouping/constraints must be chosen very carefully. Avoid any aribitrary selections of particular relatioships; suggested to use the well-confirmed relationship, unless for special purpose.
+## Description and notes
 
-Installation
-------------
+`cladeFilter` reports tips as potential paralogs that violate the
+groupings provided in `taxa` for each gene tree of `trees`. Users can
+provide `taxa` directly, or generate one by `concor.node` and
+`createGrouping`. **IMPORTANT NOTE:** The grouping/constraints must be
+chosen very carefully. Avoid any aribitrary selections of particular
+relatioships; suggested to use the well-confirmed relationship, unless
+for special purpose.
+
+## Installation
 
 ``` r
 #install.packages("rePhylo")
 ```
 
-Usage and examples
-------------------
+## Usage and examples
 
 First get the datasets:
 
@@ -35,9 +41,11 @@ ref <- Brassidata$ref
 
 `trees` contains all gene trees to be investigated as a list.
 
-`taxa` is a `data.frame` that gives grouping information. The first column must be tip names in any of the test trees (gene trees).
+`taxa` is a `data.frame` that gives grouping information. The first
+column must be tip names in any of the test trees (gene trees).
 
-`ref` is a reference tree (when using **Method 1**)
+`ref` is a reference tree (when using **Method
+1**)
 
 #### Method 1
 
@@ -61,13 +69,13 @@ head(taxa)
 ## 6       Cardamine_hirsute_ge_Cardamineae cladeA
 ```
 
-Details
--------
+## Details
 
 You can also embed plots, for example:
 
-![](README_figs/README-pressure-1.png)
+![](README_figs/README-pressure-1.png)<!-- -->
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+Note that the `echo = FALSE` parameter was added to the code chunk to
+prevent printing of the R code that generated the plot.
 
 For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
