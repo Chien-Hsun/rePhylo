@@ -5,11 +5,11 @@
 \title{Plot Concordances}
 \usage{
 \method{plot}{concor}(x, levelcol = NULL, thres = NULL,
-  type = c("percent", "count"), node.cex = 0.5, node.adj = c(0.5, 0.5),
-  node.frame = "rect", ...)
+  type = c("percent", "count"), node.cex = 0.5, node.adj = c(0.5,
+  0.5), node.frame = "rect", ...)
 }
 \arguments{
-\item{x}{an object from "\code{concor.node}".}
+\item{x}{an object from "\code{concor}".}
 
 \item{levelcol}{a character vector specifying the colors for node labels showing different
 levels of concordances. Defaults as \code{NULL}.}
