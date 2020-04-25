@@ -4,9 +4,16 @@
 \alias{plot.concor}
 \title{Plot Concordances}
 \usage{
-\method{plot}{concor}(x, levelcol = NULL, thres = NULL,
-  type = c("percent", "count"), node.cex = 0.5, node.adj = c(0.5,
-  0.5), node.frame = "rect", ...)
+\method{plot}{concor}(
+  x,
+  levelcol = NULL,
+  thres = NULL,
+  type = c("percent", "count"),
+  node.cex = 0.5,
+  node.adj = c(0.5, 0.5),
+  node.frame = "rect",
+  ...
+)
 }
 \arguments{
 \item{x}{an object from "\code{concor}".}

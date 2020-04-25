@@ -37,8 +37,10 @@ Concordance for a node is defined as all descendent tips of the node of \code{re
     each node (when \code{getTreeNames = TRUE}).
 }
 \examples{
+\dontrun{
 data(Brassidata)
 trees <- Brassidata$trees
 ref <- Brassidata$ref
 concor.n<-concor.node(ref = ref,trees = trees, bp = c(0,30,50), getTreeNames = FALSE)
+}
 }

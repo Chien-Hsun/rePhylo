@@ -4,8 +4,14 @@
 \alias{summarizeMulticf}
 \title{Summarize \code{cladeFilter} Results with Multiple Groupings}
 \usage{
-summarizeMulticf(x, trees, plot.tree = TRUE, write.table = TRUE,
-  rm.col = c(rmOnce = "red", rmMulti = "blue"), ...)
+summarizeMulticf(
+  x,
+  trees,
+  plot.tree = TRUE,
+  write.table = TRUE,
+  rm.col = c(rmOnce = "red", rmMulti = "blue"),
+  ...
+)
 }
 \arguments{
 \item{x}{an object from "\code{cladeFilter}".}

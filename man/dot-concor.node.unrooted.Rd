@@ -4,9 +4,17 @@
 \alias{.concor.node.unrooted}
 \title{.concor.node.unrooted}
 \usage{
-.concor.node.unrooted(ref, trees, bp = 0, getTreeNames = FALSE,
-  node = NULL, warn = TRUE, unresolve.ref = FALSE,
-  unresolve.para = c(bp = NA, percent = 0.8), from)
+.concor.node.unrooted(
+  ref,
+  trees,
+  bp = 0,
+  getTreeNames = FALSE,
+  node = NULL,
+  warn = TRUE,
+  unresolve.ref = FALSE,
+  unresolve.para = c(bp = NA, percent = 0.8),
+  from
+)
 }
 \arguments{
 \item{ref}{ref}

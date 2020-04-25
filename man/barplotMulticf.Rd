@@ -4,8 +4,14 @@
 \alias{barplotMulticf}
 \title{Summarize \code{cladeFilter} Result in Barplot}
 \usage{
-barplotMulticf(x, type = c("groupings", "genetrees", "species"),
-  reorder = "up", plot = TRUE, pdf = FALSE, pwd = c(7, 10, 10))
+barplotMulticf(
+  x,
+  type = c("groupings", "genetrees", "species"),
+  reorder = "up",
+  plot = TRUE,
+  pdf = FALSE,
+  pwd = c(7, 10, 10)
+)
 }
 \arguments{
 \item{x}{an object from "\code{summarizeMulticf}".}

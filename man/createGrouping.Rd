@@ -4,8 +4,7 @@
 \alias{createGrouping}
 \title{Creating a Taxa Table as Input to Other Functions in package \code{youshu}}
 \usage{
-createGrouping(concor, percent = 0.5, count = NULL, bp = NULL,
-  nodes = NULL)
+createGrouping(concor, percent = 0.5, count = NULL, bp = NULL, nodes = NULL)
 }
 \arguments{
 \item{concor}{an object from "\code{concor.node}".}
