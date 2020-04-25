@@ -635,7 +635,8 @@ root.dist<-function(z, tar, bp = FALSE){
   options(warn=-1)
   rrt$node.label <- as.character(as.numeric(rrt$node.label,warn=FALSE))
   rrt <- rewrite.tree(rrt)
-
+  options(warn=1)
+  
   return(rrt)
 }
 
