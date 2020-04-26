@@ -51,12 +51,17 @@ summarize_sp_for_GD <-
   allsp <- dat[ , "sp"]
   allsp <- unlist(strsplit(allsp, split = ",", 
                            fixed = TRUE))
-  sp <- allsp
+  sp <- allsp[order(allsp)]
   data <- data.frame(sp)
   
   # make plot
   gglist <- vector("list", 2)
-  g1 <- ggplot2::ggplot(data, ggplot2::aes_string(x = "sp"))
+  g1 <- 
+    ggplot2::ggplot(
+      data, ggplot2::aes_string(
+        x = stats::reorder(x = data[ , "sp"], 
+                           X = rep(1, nrow(data)), 
+                           FUN = function(x) sum(x))))
   
   gg1 <- g1 + ggplot2::geom_bar(ggplot2::aes_string(fill = "sp"),
                                 position = ggplot2::position_stack(reverse = TRUE),
@@ -69,38 +74,45 @@ summarize_sp_for_GD <-
   gglist[[1]] <- gg1
   
   if(pdf){
+    plen<-NULL
     if(is.null(pdflen)){
       # set pdf size
-      pdflen <- unique(data[ , "sp"])
-      pdflen <- length(pdflen)
-      pdflen <- pdflen * 0.2
-      if(pdflen < 3)
-        pdflen <- 3
+      plen <- unique(dat[ , "sp"])
+      plen <- length(plen)
+      plen <- plen * 0.2
+      if(plen < 3)
+        plen <- 3
+    } else {
+      plen <- pdflen
     }
 
     pdfname1 <- paste("Distribution_of_species_", 
                       pname, ".pdf",sep="")
-    grDevices::pdf(pdfname1, pdfwid, pdflen)
+    grDevices::pdf(file = pdfname1, width = pdfwid, 
+                   height = plen)
     print(gg1)
     grDevices::dev.off()
   }
   
+  
+  
   # make plot-2: x == sp number, y == count of gd
-  sp_num <- dat[ , "sp_num"]
+  sp_num <- as.numeric(dat[ , "sp_num"])
+  # make factor for order
+  sp_num <- as.factor(as.numeric(sp_num))
   data <- data.frame(sp_num)
   
   # make plot
-  g1 <- 
-    ggplot2::ggplot(
-      data, ggplot2::aes_string(
-        x = stats::reorder(x = data[ , "sp_num"], 
-                         X = rep(1, nrow(data)), 
-                         FUN = function(x) sum(x))))
+  g1 <- ggplot2::ggplot(data, ggplot2::aes_string(x = "sp_num"))
+  
   gg1 <- g1 + ggplot2::geom_bar(
     ggplot2::aes_string(fill = "sp_num"), 
     position = ggplot2::position_stack(reverse = TRUE),
                                 show.legend = FALSE) +
+    # make vertical plot
     ggplot2::coord_flip() + 
+    # reverse order
+    ggplot2::scale_x_discrete(limits = rev(levels(data$sp_num))) +
     ggplot2::guides(fill = ggplot2::guide_legend(title = "")) + 
     # no title for color legend
     ggplot2::xlab(label = "sp_num")
@@ -108,18 +120,21 @@ summarize_sp_for_GD <-
   gglist[[2]] <- gg1
   
   if(pdf){
+    plen <- NULL
     if(is.null(pdflen)){
-      # set pdf size
-      pdflen <- unique(data[ , "sp_num"])
-      pdflen <- length(pdflen)
-      pdflen <- pdflen * 0.2
-      if(pdflen < 3)
-        pdflen <- 3
+      plen <- unique(dat[ ,"sp_num"])
+      plen <- length(plen)
+      plen <- plen * 0.2
+      if(plen < 3)
+        plen <- 3
+    } else {
+      plen <- pdflen
     }
     
     pdfname2 <- paste("Distribution_species_num_", 
                       pname, ".pdf", sep="")
-    grDevices::pdf(pdfname2, pdfwid, pdflen)
+    grDevices::pdf(file = pdfname2, width = pdfwid, 
+                   height = plen)
     print(gg1)
     grDevices::dev.off()
   }

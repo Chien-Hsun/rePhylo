@@ -64,8 +64,6 @@ cladeFilter <- function(trees, taxa, level = NULL, write.table = TRUE){
   # removing "warn = FALSE"
 
   warn <- TRUE
-  #  library(ape) # required
-  #  library(phangorn) # required
 
   clas <- unlist(lapply(trees, function(z) inherits(z, "phylo")))
   if(!inherits(trees, "list") | !all(clas))
