@@ -13,9 +13,9 @@
 #' @param phyto_node a table with the first column as the phyto id given by Tree2GD and 
 #'     the second column as the node id from \code{ape}.
 #' @param trees a list of objects of class "\code{phylo}".
-#'     A list of gene trees to be examined.
+#'     A list of gene trees to be examined. Can be unrooted.
 #' @param gdtable a \code{data.frame} of the gd table file provided by Tree2GD.
-#' @param sptree the species tree used to do tree reconciliation.
+#' @param sptree the species tree used to do tree reconciliation. 
 #' @param split a character. The symbol used to separate species name and the 
 #'     sequence number in the gene family trees.
 #' @param tree_id_tab a table for the tree id during Tree2GD and the name of the 
@@ -23,8 +23,6 @@
 #'     is the tree names. 
 #' @param up_one_node logical. Whether to choose tips of one node deeper as the 
 #'     closest outgroup, as a second step of investigation. Default \code{FALSE}.
-#' @param outgroup_for_tree optional. The outgroup for the whole species tree.
-#'     If given, these outgroups will be colored as yellow.
 #' @param pdfwid the width of pdf file for subtrees. Default \code{10}.
 #' @param pdflen the length of pdf file for subtrees. Default \code{30}.
 #' @export
@@ -38,7 +36,7 @@
 #' detect_closest_out_of_GD(
 #' phyto_node,trees = trees,gdtable = gdtable,
 #' sptree = sptree,split=".",tree_id_tab = tree_id_tab,
-#' up_one_node=FALSE,outgroup_for_tree=out[,1],pdfwid = 20,pdflen = 100)
+#' up_one_node=FALSE,pdfwid = 20,pdflen = 100)
 #' 
 #' res
 #' }
@@ -47,8 +45,15 @@
 detect_closest_out_for_GD <- function(
   phyto_node, trees, gdtable, sptree, split, 
   tree_id_tab, up_one_node = FALSE, 
-  outgroup_for_tree = NULL,
   pdfwid = 10, pdflen = 30){
+  
+  # check if tree names matched
+  t1 <- names(trees)
+  t2 <- tree_id_tab[ ,2]
+  m <- match(t1, t2)
+  if(all(is.na(m))){
+    stop("Names in tree list are different from the tree_id_tab.")
+  }
   
   sum<-lapply(1:nrow(phyto_node),function(z) 
     .detect_out(z, phyto_node,trees, 
@@ -56,7 +61,6 @@ detect_closest_out_for_GD <- function(
                 split,
                 tree_id_tab,
                 up_one_node = up_one_node,
-                outgroup_for_tree = outgroup_for_tree,
                 pdfwid = pdfwid,
                 pdflen = pdflen))
 
@@ -90,8 +94,6 @@ detect_closest_out_for_GD <- function(
 #'     is the tree names. 
 #' @param up_one_node logical. Whether to choose tips of one node deeper as the 
 #'     closest outgroup, as a second step of investigation. Default \code{FALSE}.
-#' @param outgroup_for_tree optional. The outgroup for the whole species tree.
-#'     If given, these outgroups will be colored as yellow.
 #' @param pdfwid the width of pdf file for subtrees. Default \code{10}.
 #' @param pdflen the length of pdf file for subtrees. Default \code{30}.
 #' @export
@@ -116,7 +118,6 @@ detect_closest_out_for_GD <- function(
 .detect_out<-function(
   x, phyto_node, trees, gdtable, sptree,
   split, tree_id_tab, up_one_node = up_one_node,
-  outgroup_for_tree = outgroup_for_tree, 
   pdfwid = pdfwid, pdflen = pdflen){
   
   wgdt <- phyto_node[x,1]
@@ -203,7 +204,7 @@ detect_closest_out_for_GD <- function(
     names(pairs)<-names(plist)[w]
     
     for(y in 1:length(pairs)){
-      pair<-pairs[[y]]
+      pair<-unique(pairs[[y]])
       pn<-names(pairs)[y]
       
       # root by the most distant node
@@ -249,11 +250,6 @@ detect_closest_out_for_GD <- function(
         tips<-lapply(tips,function(xx)
           unlist(strsplit(xx,split = split,fixed = TRUE))[1])
         tips<-unlist(tips)
-        if(!is.null(outgroup_for_tree)){
-          # color outgroups in yellow
-          w<-which(tips %in% outgroup_for_tree);w
-          if(length(w) > 0){tipcol[w]<-"yellow"}
-        }
         # color basal tips in green
         w<-which(tips %in% btips);w
         if(length(w) > 0){tipcol[w]<-"green"}

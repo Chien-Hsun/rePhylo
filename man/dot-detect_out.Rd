@@ -13,7 +13,6 @@
   split,
   tree_id_tab,
   up_one_node = up_one_node,
-  outgroup_for_tree = outgroup_for_tree,
   pdfwid = pdfwid,
   pdflen = pdflen
 )
@@ -40,9 +39,6 @@ is the tree names.}
 
 \item{up_one_node}{logical. Whether to choose tips of one node deeper as the 
 closest outgroup, as a second step of investigation. Default \code{FALSE}.}
-
-\item{outgroup_for_tree}{optional. The outgroup for the whole species tree.
-If given, these outgroups will be colored as yellow.}
 
 \item{pdfwid}{the width of pdf file for subtrees. Default \code{10}.}
 

@@ -4,7 +4,13 @@
 \alias{summarize_sp_for_GD}
 \title{Summarize number of species supporting gd}
 \usage{
-summarize_sp_for_GD(phyto, pdf = TRUE, pdfwid = 5, pdflen = NULL)
+summarize_sp_for_GD(
+  phyto,
+  pdf = TRUE,
+  pdfwid = NULL,
+  pdflen = NULL,
+  plot.type = "two"
+)
 }
 \arguments{
 \item{phyto}{a data.frame of gd table of a specific phyto node.}
@@ -15,6 +21,9 @@ Defaults to \code{TRUE}.}
 \item{pdfwid}{a numeric for width of pdf file. Defaults to 5.}
 
 \item{pdflen}{optional. Length of pdf file. Defaults to \code{NULL}.}
+
+\item{plot.type}{characters to specify the type of plot. One of 
+"two", "sp", "sp_num". Can be more than one.}
 }
 \description{
 Summarize the number of gd supported by each species, 

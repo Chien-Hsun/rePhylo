@@ -12,7 +12,6 @@ detect_closest_out_for_GD(
   split,
   tree_id_tab,
   up_one_node = FALSE,
-  outgroup_for_tree = NULL,
   pdfwid = 10,
   pdflen = 30
 )
@@ -22,7 +21,7 @@ detect_closest_out_for_GD(
 the second column as the node id from \code{ape}.}
 
 \item{trees}{a list of objects of class "\code{phylo}".
-A list of gene trees to be examined.}
+A list of gene trees to be examined. Can be unrooted.}
 
 \item{gdtable}{a \code{data.frame} of the gd table file provided by Tree2GD.}
 
@@ -37,9 +36,6 @@ is the tree names.}
 
 \item{up_one_node}{logical. Whether to choose tips of one node deeper as the 
 closest outgroup, as a second step of investigation. Default \code{FALSE}.}
-
-\item{outgroup_for_tree}{optional. The outgroup for the whole species tree.
-If given, these outgroups will be colored as yellow.}
 
 \item{pdfwid}{the width of pdf file for subtrees. Default \code{10}.}
 
@@ -65,7 +61,7 @@ res<-
 detect_closest_out_of_GD(
 phyto_node,trees = trees,gdtable = gdtable,
 sptree = sptree,split=".",tree_id_tab = tree_id_tab,
-up_one_node=FALSE,outgroup_for_tree=out[,1],pdfwid = 20,pdflen = 100)
+up_one_node=FALSE,pdfwid = 20,pdflen = 100)
 
 res
 }
