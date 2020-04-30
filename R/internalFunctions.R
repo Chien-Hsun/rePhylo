@@ -390,7 +390,9 @@ select.backbone <- function(tre, mrcalist){
     trs <- as.list(trs)
     trs <- lapply(trs, function(x) return(testTree[[x]]))
     # input are: testTree as a list of many trees, refTips is tips of one node
-    matchTips_res <- lapply(trs, function(xx) .matchTips(zz = xx, refTips = refTips, setBP = setBP, reftips = reftips))
+    matchTips_res <- lapply(trs, function(xx) 
+      .matchTips(zz = xx, refTips = refTips, setBP = setBP, 
+                 reftips = reftips))
 
     ttx <- function(xx, matchTips_res){
       after <- xx$after
@@ -582,7 +584,7 @@ root.dist<-function(z, tar, bp = FALSE){
     ww2<-c(1:length(rt$tip.label))[-tartip]
     dd2<-dd[ww2,]
     dd2<-data.frame(dd2)
-  } else if(length(tartip) > 0 & length(tartip) != 1) {
+  } else if(length(tartip) > 1) {
     tt<-rt$tip.label[tartip]
     dd2<-dd[,tartip];ncol(dd2);nrow(dd2)
     dd2<-dd2[-tartip,];ncol(dd2);nrow(dd2)
@@ -626,7 +628,7 @@ root.dist<-function(z, tar, bp = FALSE){
   rr <- phangorn::Descendants(x = rt, node = rr, type = "children")
   rr <- rr[rr <= length(rt$tip.label)]
   if(length(rr) > 0){
-    if(root == rt$tip.label[rr] & bp){
+    if(all(rt$tip.label[rr] %in% root) & bp){
       return(rt)
     }
   }

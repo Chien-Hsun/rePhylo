@@ -148,7 +148,7 @@ detect_closest_out_for_GD <- function(
   pp <- pp[!dup]
   tt <- tt[!dup]
   plist<-vector("list",length(pp)) # gd
-  names(plist)<-tt
+  names(plist)<-pp
   for(i in 1:length(pp)){
     w<-which(p109[,2] == pp[i])
     t<-lapply(w,function(xx) c(p109[xx,5],p109[xx,6]))
@@ -195,83 +195,90 @@ detect_closest_out_for_GD <- function(
   for(i in 1:length(target.order)){
     options(warn = 1)
     t<-target.order[i]
+    tr<-NULL
     tr<-target.trees[[i]]
-    
-    # required gd
-    w<-which(tt == t)
-    pairs<-lapply(w,function(xx)
-      return(plist[[xx]]))
-    names(pairs)<-names(plist)[w]
-    
-    for(y in 1:length(pairs)){
-      pair<-unique(pairs[[y]])
-      pn<-names(pairs)[y]
+    if(is.null(tr)){
+      warning("A tree in gdtable is not present in trees object: ",t,"\n")
+    } else {
       
-      # root by the most distant node
-      options(warn=-1)
-      tr<-root.dist(tr,tar = pair)
-      tr<-rewrite.tree(ape::ladderize(tr,right=FALSE))
+      # required gd
+      w<-which(tt == t)
+      pairs<-lapply(w,function(xx)
+        return(plist[[xx]]))
+      names(pairs)<-names(plist)[w]
       
-      options(warn=1)
-      mrca<-ape::getMRCA(tr,tip = pair);mrca
-      if(mrca != phangorn::getRoot(tr)){
-        anc<-phangorn::Ancestors(tr,node = mrca,type = "parent");anc
-        des<-phangorn::Descendants(tr,node = anc,type = "children");des
-        sis<-des[-which(des == mrca)];sis
+      for(y in 1:length(pairs)){
+        pair<-unique(pairs[[y]])
+        pn<-names(pairs)[y]
         
-        if(sis <= length(tr$tip.label)){ # tips
-          stips<-tr$tip.label[sis]
-        } else { # nodes
-          str<-ape::extract.clade(tr,node = sis)
-          stips<-str$tip.label
-        }
-        # see if contain basal tips
-        stips<-lapply(stips,function(xx)
-          unlist(strsplit(xx,split = split,fixed = TRUE))[1])
-        stips<-unlist(stips)
-        check<-stips %in% btips
-        if(any(check)){ # having basal tips
-          res<-c(ntreenames[i],"TRUE")
+        # root by the most distant node
+        #      options(warn=-1)
+        tr<-root.dist(tr,tar = pair)
+        tr<-rewrite.tree(ape::ladderize(tr,right=FALSE))
+        
+        options(warn=1)
+        mrca<-ape::getMRCA(tr,tip = pair);mrca
+        if(mrca != phangorn::getRoot(tr)){
+          anc<-phangorn::Ancestors(tr,node = mrca,type = "parent");anc
+          des<-phangorn::Descendants(tr,node = anc,type = "children");des
+          sis<-des[-which(des == mrca)];sis
+          
+          if(sis <= length(tr$tip.label)){ # tips
+            stips<-tr$tip.label[sis]
+          } else { # nodes
+            str<-ape::extract.clade(tr,node = sis)
+            stips<-str$tip.label
+          }
+          # see if contain basal tips
+          stips<-lapply(stips,function(xx)
+            unlist(strsplit(xx,split = split,fixed = TRUE))[1])
+          stips<-unlist(stips)
+          check<-stips %in% btips
+          if(any(check)){ # having basal tips
+            res<-c(ntreenames[i],"TRUE")
+          } else {
+            res<-c(ntreenames[i],"FALSE")
+          }
+          ress<-rbind(ress,res)
+          
+          # plot trees
+          # to extract subtree include up-two-nodes
+          if(anc != phangorn::getRoot(tr))
+            anc<-phangorn::Ancestors(tr,node = anc,type = "parent")
+          atree<-ape::extract.clade(phy = tr,node = anc)
+          # color pairs in red
+          tipcol<-rep("black",length(atree$tip.label))
+          w<-which(atree$tip.label %in% pair);w
+          if(length(w) > 0){tipcol[w]<-"red"}
+          tips<-atree$tip.label
+          tips<-lapply(tips,function(xx)
+            unlist(strsplit(xx,split = split,fixed = TRUE))[1])
+          tips<-unlist(tips)
+          # color basal tips in green
+          w<-which(tips %in% btips);w
+          if(length(w) > 0){tipcol[w]<-"green"}
+          # plot tree
+          ape::plot.phylo(atree,tip.color = tipcol,use.edge.length = FALSE,
+                          node.depth = 2)
+          ape::nodelabels(text = atree$node.label,bg = "white")
+          graphics::title(paste("tree = ",ntreenames[i],", gd = ",pn,sep=""))
+          atree$tip.col<-tipcol
+          alist<-list(atree)
+          names(alist)<-paste(ntreenames[i],", gd = ",pn,sep="")
+          ntrees<-append(ntrees,alist)
         } else {
-          res<-c(ntreenames[i],"FALSE")
+          war<-paste(ntreenames[i],", gd ",pn," has mrca == root.",sep="")
+          warning(war)
+          res<-c(war," ")
+          ress<-rbind(ress,res)
+          trr<-list(tr)
+          names(trr)<-paste(ntreenames[i],", gd = ",pn,sep="")
+          ntrees<-append(ntrees,trr)
         }
-        ress<-rbind(ress,res)
+      } # for gd
+      
+    } # if tree is not NULL
 
-        # plot trees
-        # to extract subtree include up-two-nodes
-        if(anc != phangorn::getRoot(tr))
-          anc<-phangorn::Ancestors(tr,node = anc,type = "parent")
-        atree<-ape::extract.clade(phy = tr,node = anc)
-        # color pairs in red
-        tipcol<-rep("black",length(atree$tip.label))
-        w<-which(atree$tip.label %in% pair);w
-        if(length(w) > 0){tipcol[w]<-"red"}
-        tips<-atree$tip.label
-        tips<-lapply(tips,function(xx)
-          unlist(strsplit(xx,split = split,fixed = TRUE))[1])
-        tips<-unlist(tips)
-        # color basal tips in green
-        w<-which(tips %in% btips);w
-        if(length(w) > 0){tipcol[w]<-"green"}
-        # plot tree
-        ape::plot.phylo(atree,tip.color = tipcol,use.edge.length = FALSE,
-             node.depth = 2)
-        ape::nodelabels(text = atree$node.label,bg = "white")
-        graphics::title(paste("tree = ",ntreenames[i],", gd = ",pn,sep=""))
-        atree$tip.col<-tipcol
-        alist<-list(atree)
-        names(alist)<-paste(ntreenames[i],", gd = ",pn,sep="")
-        ntrees<-append(ntrees,alist)
-      } else {
-        war<-paste(ntreenames[i],", gd ",pn," has mrca == root.",sep="")
-        warning(war)
-        res<-c(war," ")
-        ress<-rbind(ress,res)
-        tr<-list(tr)
-        names(tr)<-paste(ntreenames[i],", gd = ",pn,sep="")
-        ntrees<-append(ntrees,tr)
-      }
-    } # for gd
   } # for trees
   grDevices::dev.off()
   #

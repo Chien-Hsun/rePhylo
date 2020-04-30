@@ -217,7 +217,9 @@ concor.node <- function(ref, trees, bp = 0, getTreeNames = FALSE, node = NULL){
       setBP <- setBPs[j]
       # get .concon result of specified node or all nodes of this tree,
       # as nodes are used in "refinfo" and for test trees they are just follows the nodes in refinfo
-      con_results[[j]] <- lapply(tiplist2, function(x) .concon(x, testTree = testTree, setBP = setBP, reftips = reftips, from = from))
+      con_results[[j]] <- lapply(tiplist2, function(x) 
+        .concon(x, testTree = testTree, setBP = setBP, 
+                reftips = reftips, from = from))
     }
 
 
