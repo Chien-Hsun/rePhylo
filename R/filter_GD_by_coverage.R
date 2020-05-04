@@ -1,14 +1,11 @@
 ###################################################
-## detect_closest_out_for_GD
+## filter_GD_by_coverage
 ###################################################
-#' @title Detect the existence of the closest outgroups for each gd
+#' @title filters the GD counts by the species coverage of
+#'     each of the duplicated subclades
 #'
-#' @description \code{detect_closest_out_for_GD} is to find out whether each gd 
-#'     has tips of its sister clade as the closest outgroup, in order to verify 
-#'     the support of gd. The returning object contains a simple summary for the 
-#'     number and percent of gd that has the closest outgroup. This function will 
-#'     also produce pdf files plotting subclade of each gd, with tips colored, 
-#'     for easier manual investigation when required.
+#' @description \code{filter_GD_by_coverage} is to identify for each gd whether the two 
+#'     duplicated subclades contains species number more than a given level.
 #'
 #' @param phyto_node a table with the first column as the phyto id given by Tree2GD and 
 #'     the second column as the node id from \code{ape}.
@@ -16,6 +13,8 @@
 #'     A list of gene trees to be examined. Can be unrooted.
 #' @param gdtable a \code{data.frame} of the gd table file provided by Tree2GD.
 #' @param sptree the species tree used to do tree reconciliation. 
+#' @param sub_coverage a numeric specify the species coverage level. 
+#'     If <= 1, treated as percentage. If > 1, treated as number of species.
 #' @param split a character. The symbol used to separate species name and the 
 #'     sequence number in the gene family trees.
 #' @param tree_id_tab a table for the tree id during Tree2GD and the name of the 
@@ -26,25 +25,19 @@
 #' @param pdfwid the width of pdf file for subtrees. Default \code{10}.
 #' @param pdflen the length of pdf file for subtrees. Default \code{30}.
 #' @export
-#' @details For each gd, detect whether there are closest outgroups
-#'    exactly next to the duplicated node, that can actually define 
-#'    the gd at the indicated node. Otherwise, gd will be possible 
-#'    to be at other (deeper) nodes as well.
-#' @examples
-#' \dontrun{
-#' res<-
-#' detect_closest_out_of_GD(
-#' phyto_node,trees = trees,gdtable = gdtable,
-#' sptree = sptree,split=".",tree_id_tab = tree_id_tab,
-#' up_one_node=FALSE,pdfwid = 20,pdflen = 100)
-#' 
-#' res
-#' }
+#' @details returns a pdf plotting the gd clades, with gd pairs 
+#'     in red and other species in the same clade in sptree in green.
+#'     A file with prefix "Include_or_not_" indicates for each tree 
+#'     and gd the requirement is fulfilled or not. A file with prefix
+#'     "Trees_have_basal_tips_" shows the page number the tree fulfilled
+#'     the requirement in the pdf file. 
+
 
 # only for lapply
-detect_closest_out_for_GD <- function(
+filter_GD_by_coverage <- function(
   phyto_node, trees, gdtable, sptree, split, 
-  tree_id_tab, up_one_node = FALSE, 
+  tree_id_tab, sub_coverage = 2,
+  up_one_node = FALSE, 
   pdfwid = 10, pdflen = 30){
   
   # check if tree names matched
@@ -56,10 +49,14 @@ detect_closest_out_for_GD <- function(
   }
   
   sum<-lapply(1:nrow(phyto_node),function(z) 
-    .detect_out(z, phyto_node,trees, 
-                gdtable,sptree,
-                split,
-                tree_id_tab,
+    .filter_coverage(x = z, 
+                phyto_node = phyto_node,
+                trees = trees, 
+                gdtable = gdtable,
+                sptree = sptree,
+                sub_coverage = sub_coverage, 
+                split = split, 
+                tree_id_tab = tree_id_tab,
                 up_one_node = up_one_node,
                 pdfwid = pdfwid,
                 pdflen = pdflen))
@@ -70,15 +67,12 @@ detect_closest_out_for_GD <- function(
 
 
 # main function but internal for lapply
-#' @title Internal. Detect the existence of the closest outgroups for each gd
+#' @title Internal. Filters the GD counts by the species coverage of
+#'     each of the duplicated subclades
 #'
-#' @description Main internal function for \code{detect_closest_out_for_GD} 
-#'     that is to find out whether each gd 
-#'     has tips of its sister clade as the closest outgroup, in order to verify 
-#'     the support of gd. The returning object contains a simple summary for the 
-#'     number and percent of gd that has the closest outgroup. This function will 
-#'     also produce pdf files plotting subclade of each gd, with tips colored, 
-#'     for easier manual investigation when required.
+#' @description Main internal function for \code{filter_GD_by_coverage} 
+#'     to identify for each gd whether the two 
+#'     duplicated subclades contains species number more than a given level.
 #'
 #' @param x the row of phyto_node to be tested
 #' @param phyto_node a table with the first column as the phyto id given by Tree2GD and 
@@ -87,6 +81,8 @@ detect_closest_out_for_GD <- function(
 #'     A list of gene trees to be examined.
 #' @param gdtable a \code{data.frame} of the gd table file provided by Tree2GD.
 #' @param sptree the species tree used to do tree reconciliation.
+#' @param sub_coverage a numeric specify the species coverage level. 
+#'     If <= 1, treated as percentage. If > 1, treated as number of species.
 #' @param split a character. The symbol used to separate species name and the 
 #'     sequence number in the gene family trees.
 #' @param tree_id_tab a table for the tree id during Tree2GD and the name of the 
@@ -97,10 +93,6 @@ detect_closest_out_for_GD <- function(
 #' @param pdfwid the width of pdf file for subtrees. Default \code{10}.
 #' @param pdflen the length of pdf file for subtrees. Default \code{30}.
 #' @export
-#' @details For each gd, detect whether there are closest outgroups
-#'    exactly next to the duplicated node, that can actually define 
-#'    the gd at the indicated node. Otherwise, gd will be possible 
-#'    to be at other (depper) nodes as well.
 #' @importFrom ape plot.phylo
 #' @importFrom ape nodelabels
 #' @importFrom ape extract.clade
@@ -113,10 +105,10 @@ detect_closest_out_for_GD <- function(
 #' @importFrom grDevices dev.off
 #' @importFrom graphics title
 #' @keywords internal function
-#' @seealso \code{\link{detect_closest_out_for_GD}}
+#' @seealso \code{\link{filter_GD_by_coverage}}
 
-.detect_out<-function(
-  x, phyto_node, trees, gdtable, sptree,
+.filter_coverage<-function(
+  x, phyto_node, trees, gdtable, sptree, sub_coverage,
   split, tree_id_tab, up_one_node = up_one_node,
   pdfwid = pdfwid, pdflen = pdflen){
   
@@ -156,32 +148,15 @@ detect_closest_out_for_GD <- function(
     plist[[i]]<-t
   }
   
-  
-  # get basal tips
+  # get target clade tips
   w<-which(phyto_node[,1] == wgdt)
-  bnode<-as.numeric(phyto_node[w,2])
-  anc<-phangorn::Ancestors(sptree,node = bnode,type = "parent")
-  des<-phangorn::Descendants(sptree,node = anc,type = "children")
-  des<-des[-which(des == bnode)]
-  if(des <= length(sptree$tip.label)){
-    btips<-sptree$tip.label[des]
-  } else {
-    st<-ape::extract.clade(sptree,node = des)
-    btips<-st$tip.label
+  des<-as.numeric(phyto_node[w,2])
+  st<-ape::extract.clade(sptree,node = des)
+  btips<-st$tip.label
+  if(length(btips) < sub_coverage){
+    sub_coverage <- length(btips)
   }
-  if(up_one_node){
-    bnode<-anc
-    anc<-phangorn::Ancestors(sptree,node = bnode,type = "parent")
-    des<-phangorn::Descendants(sptree,node = anc,type = "children")
-    des<-des[-which(des == bnode)]
-    if(des <= length(sptree$tip.label)){
-      btips<-sptree$tip.label[des]
-    } else {
-      st<-ape::extract.clade(sptree,node = des)
-      btips<-st$tip.label
-    }
-  }
-  cat("basal_tips:\n")
+  cat("All tips of the gd clade:\n")
   cat(btips,sep=", ")
   cat("\n")
   
@@ -216,40 +191,63 @@ detect_closest_out_for_GD <- function(
         tr<-root.dist(tr,tar = pair)
         tr<-rewrite.tree(ape::ladderize(tr,right=FALSE))
         
-        options(warn=1)
+        options(warn = 1)
         mrca<-ape::getMRCA(tr,tip = pair);mrca
         if(mrca != phangorn::getRoot(tr)){
-          anc<-phangorn::Ancestors(tr,node = mrca,type = "parent");anc
-          des<-phangorn::Descendants(tr,node = anc,type = "children");des
-          sis<-des[-which(des == mrca)];sis
+          des<-phangorn::Descendants(tr,node = mrca,
+                                     type = "children");des
+          # filter for the two des 
+          # == the two duplicated subclades
+          tmp <- 0
+          for(ndes in 1:length(des)){
+            sis <- des[ndes]
+            
+            if(sis <= length(tr$tip.label)){
+              # tips
+              stips<-tr$tip.label[sis]
+            } else { # nodes
+              str<-ape::extract.clade(tr,node = sis)
+              stips<-str$tip.label
+            }
+            # see the coverage of subclade sp
+            stips<-lapply(stips,function(xx)
+              unlist(strsplit(xx,split = split,fixed = TRUE))[1])
+            stips<-unlist(stips)
+            check<-stips %in% btips
+            if(sub_coverage <= 1){ # percent
+              
+              blen <- length(btips)
+              len <- length(which(check))
+              len <- len / blen
+              if(len >= sub_coverage){
+                tmp <- tmp + 1
+              }
+              
+            } else if(sub_coverage > 1){ # count
+              
+              len <- length(which(check))
+              if(len >= sub_coverage){ # number of covered tips
+                tmp <- tmp + 1
+              }
+            }
+          } # for the 2 des
           
-          if(sis <= length(tr$tip.label)){ # tips
-            stips<-tr$tip.label[sis]
-          } else { # nodes
-            str<-ape::extract.clade(tr,node = sis)
-            stips<-str$tip.label
-          }
-          # see if contain basal tips
-          stips<-lapply(stips,function(xx)
-            unlist(strsplit(xx,split = split,fixed = TRUE))[1])
-          stips<-unlist(stips)
-          check<-stips %in% btips
-          if(any(check)){ # having basal tips
-            res<-c(ntreenames[i],"TRUE")
+          # summarize result for the two nodes
+          # tmp == 2 means both subclade meet the requirement
+          if(tmp == 2){
+            res<-c(ntreenames[i], pn, "TRUE")
           } else {
-            res<-c(ntreenames[i],"FALSE")
+            res<-c(ntreenames[i], pn, "FALSE")
           }
           ress<-rbind(ress,res)
           
+
           # plot trees
-          # to extract subtree include up-two-nodes
-          if(anc != phangorn::getRoot(tr))
-            anc<-phangorn::Ancestors(tr,node = anc,type = "parent")
-          atree<-ape::extract.clade(phy = tr,node = anc)
-          # color pairs in red
+          # in "detect_out" extracts subtree include up-two-nodes
+          # here can just extract subtree
+          atree<-ape::extract.clade(phy = tr,node = mrca)
+          # prepare tip colors
           tipcol<-rep("black",length(atree$tip.label))
-          w<-which(atree$tip.label %in% pair);w
-          if(length(w) > 0){tipcol[w]<-"red"}
           tips<-atree$tip.label
           tips<-lapply(tips,function(xx)
             unlist(strsplit(xx,split = split,fixed = TRUE))[1])
@@ -257,23 +255,32 @@ detect_closest_out_for_GD <- function(
           # color basal tips in green
           w<-which(tips %in% btips);w
           if(length(w) > 0){tipcol[w]<-"green"}
+          # color pairs in red
+          w<-which(atree$tip.label %in% pair);w
+          if(length(w) > 0){tipcol[w]<-"red"}
           # plot tree
-          ape::plot.phylo(atree,tip.color = tipcol,use.edge.length = FALSE,
+          ape::plot.phylo(atree,tip.color = tipcol,
+                          use.edge.length = FALSE,
                           node.depth = 2)
-          ape::nodelabels(text = atree$node.label,bg = "white")
-          graphics::title(paste("tree = ",ntreenames[i],", gd = ",pn,sep=""))
-          atree$tip.col<-tipcol
-          alist<-list(atree)
-          names(alist)<-paste(ntreenames[i],", gd = ",pn,sep="")
-          ntrees<-append(ntrees,alist)
+          ape::nodelabels(text = atree$node.label,
+                          bg = "white")
+          graphics::title(paste("tree = ", ntreenames[i],
+                                ", gd = ", pn, sep=""))
+          atree$tip.col <- tipcol
+          alist <- list(atree)
+          names(alist) <- paste(ntreenames[i], ", gd = ", 
+                              pn, sep="")
+          ntrees <- append(ntrees,alist)
         } else {
-          war<-paste(ntreenames[i],", gd ",pn," has mrca == root.",sep="")
+          war <- paste(ntreenames[i], ", gd ", 
+                       pn, " has mrca == root.", sep="")
           warning(war)
-          res<-c(war," ")
-          ress<-rbind(ress,res)
-          trr<-list(tr)
-          names(trr)<-paste(ntreenames[i],", gd = ",pn,sep="")
-          ntrees<-append(ntrees,trr)
+          res <- c(war, " ", " ")
+          ress <- rbind(ress, res)
+          trr <- list(tr)
+          names(trr) <- paste(ntreenames[i], ", gd = ", 
+                              pn, sep="")
+          ntrees <- append(ntrees, trr)
         }
       } # for gd
       
@@ -289,7 +296,7 @@ detect_closest_out_for_GD <- function(
   # the first column is the tree id, the second column is TREU/FALSE
   # thus the first column may be duplicated
   
-  tar<-ress[,2]
+  tar<-ress[,3]
   w<-which(tar == "TRUE")
   lw<-length(w) # length of having closest outgroups
   lt<-length(tar) # length of all gd
