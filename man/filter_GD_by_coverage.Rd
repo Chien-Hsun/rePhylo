@@ -12,7 +12,8 @@ filter_GD_by_coverage(
   sptree,
   split,
   tree_id_tab,
-  sub_coverage = 2,
+  sub_coverage = NULL,
+  max.tip = NULL,
   up_one_node = FALSE,
   pdfwid = 10,
   pdflen = 30
@@ -38,6 +39,11 @@ is the tree names.}
 
 \item{sub_coverage}{a numeric specify the species coverage level. 
 If <= 1, treated as percentage. If > 1, treated as number of species.}
+
+\item{max.tip}{an integer specifying the max number of tips
+for the coverage filtering. Applied only when sub_coverage 
+is set as percent (<= 1). Used as a cutoff for coverage as 
+N tips as for deep nodes having large clades.}
 
 \item{up_one_node}{logical. Whether to choose tips of one node deeper as the 
 closest outgroup, as a second step of investigation. Default \code{FALSE}.}

@@ -12,6 +12,7 @@
   gdtable,
   sptree,
   sub_coverage,
+  max.tip,
   split,
   tree_id_tab,
   up_one_node = up_one_node,
@@ -34,6 +35,11 @@ A list of gene trees to be examined.}
 
 \item{sub_coverage}{a numeric specify the species coverage level. 
 If <= 1, treated as percentage. If > 1, treated as number of species.}
+
+\item{max.tip}{an integer specifying the max number of tips
+for the coverage filtering. Applied only when sub_coverage 
+is set as percent (<= 1). Used as a cutoff for coverage as 
+N tips as for deep nodes having large clades.}
 
 \item{split}{a character. The symbol used to separate species name and the 
 sequence number in the gene family trees.}

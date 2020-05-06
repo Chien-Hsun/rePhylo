@@ -337,7 +337,7 @@ cladeFilter <- function(trees, taxa, level = NULL, write.table = TRUE){
           sub_root <- ape::getMRCA(subtree, mrcaInTree)
           allDes <- phangorn::Descendants(subtree, sub_root, type = "all")
           allDes <- allDes[allDes > length(subtree$tip.label)] # remain only nodes but not tips
-          subclade_id <- 0
+          subclade_id <- c()
           for(i in 1:length(allDes)){
             node <- allDes[i]
 
@@ -349,7 +349,7 @@ cladeFilter <- function(trees, taxa, level = NULL, write.table = TRUE){
               subclade_id <- c(subclade_id, node)
             }
           }
-          subclade_id <- subclade_id[-1]
+          subclade_id
           # here are all nodes that the clade contains only wanted species (will have nested nodes)
 
           if(length(subclade_id) == 0){

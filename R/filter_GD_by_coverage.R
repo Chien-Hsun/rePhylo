@@ -15,6 +15,10 @@
 #' @param sptree the species tree used to do tree reconciliation. 
 #' @param sub_coverage a numeric specify the species coverage level. 
 #'     If <= 1, treated as percentage. If > 1, treated as number of species.
+#' @param max.tip an integer specifying the max number of tips
+#'     for the coverage filtering. Applied only when sub_coverage 
+#'     is set as percent (<= 1). Used as a cutoff for coverage as 
+#'     N tips as for deep nodes having large clades.
 #' @param split a character. The symbol used to separate species name and the 
 #'     sequence number in the gene family trees.
 #' @param tree_id_tab a table for the tree id during Tree2GD and the name of the 
@@ -36,7 +40,7 @@
 # only for lapply
 filter_GD_by_coverage <- function(
   phyto_node, trees, gdtable, sptree, split, 
-  tree_id_tab, sub_coverage = 2,
+  tree_id_tab, sub_coverage = NULL, max.tip = NULL,
   up_one_node = FALSE, 
   pdfwid = 10, pdflen = 30){
   
@@ -55,6 +59,7 @@ filter_GD_by_coverage <- function(
                 gdtable = gdtable,
                 sptree = sptree,
                 sub_coverage = sub_coverage, 
+                max.tip = max.tip,
                 split = split, 
                 tree_id_tab = tree_id_tab,
                 up_one_node = up_one_node,
@@ -83,6 +88,10 @@ filter_GD_by_coverage <- function(
 #' @param sptree the species tree used to do tree reconciliation.
 #' @param sub_coverage a numeric specify the species coverage level. 
 #'     If <= 1, treated as percentage. If > 1, treated as number of species.
+#' @param max.tip an integer specifying the max number of tips
+#'     for the coverage filtering. Applied only when sub_coverage 
+#'     is set as percent (<= 1). Used as a cutoff for coverage as 
+#'     N tips as for deep nodes having large clades.
 #' @param split a character. The symbol used to separate species name and the 
 #'     sequence number in the gene family trees.
 #' @param tree_id_tab a table for the tree id during Tree2GD and the name of the 
@@ -109,6 +118,7 @@ filter_GD_by_coverage <- function(
 
 .filter_coverage<-function(
   x, phyto_node, trees, gdtable, sptree, sub_coverage,
+  max.tip, 
   split, tree_id_tab, up_one_node = up_one_node,
   pdfwid = pdfwid, pdflen = pdflen){
   
@@ -150,12 +160,25 @@ filter_GD_by_coverage <- function(
   
   # get target clade tips
   w<-which(phyto_node[,1] == wgdt)
-  des<-as.numeric(phyto_node[w,2])
-  st<-ape::extract.clade(sptree,node = des)
+  node<-as.numeric(phyto_node[w,2])
+  st<-ape::extract.clade(sptree,node = node)
   btips<-st$tip.label
-  if(length(btips) < sub_coverage){
-    sub_coverage <- length(btips)
+  if(!is.null(sub_coverage)){
+    if(length(btips) < sub_coverage){ 
+      # it is TRUE only when sub_coverage > 1
+      sub_coverage <- length(btips)
+    }
+    # when sub_coverage is percent (<= 1)
+    # correct sub_coverage when sub_coverage > max.tip
+    if(sub_coverage <= 1){
+      currentN <- length(btips)
+      test <- currentN * sub_coverage
+      if(!is.null(max.tip) && test > max.tip){
+        sub_coverage <- max.tip
+      } 
+    }
   }
+
   cat("All tips of the gd clade:\n")
   cat(btips,sep=", ")
   cat("\n")
@@ -167,13 +190,16 @@ filter_GD_by_coverage <- function(
   ntrees<-list()
   
   grDevices::pdf(paste("color_tip_trees_",wgdt,".pdf",sep=""),pdfwid,pdflen)
+  
   for(i in 1:length(target.order)){
     options(warn = 1)
     t<-target.order[i]
     tr<-NULL
     tr<-target.trees[[i]]
     if(is.null(tr)){
+      
       warning("A tree in gdtable is not present in trees object: ",t,"\n")
+      
     } else {
       
       # required gd
@@ -209,10 +235,13 @@ filter_GD_by_coverage <- function(
               str<-ape::extract.clade(tr,node = sis)
               stips<-str$tip.label
             }
+            
             # see the coverage of subclade sp
-            stips<-lapply(stips,function(xx)
-              unlist(strsplit(xx,split = split,fixed = TRUE))[1])
-            stips<-unlist(stips)
+            if(!is.null(split)){
+              stips<-lapply(stips,function(xx)
+                unlist(strsplit(xx,split = split,fixed = TRUE))[1])
+              stips<-unlist(stips)
+            }
             check<-stips %in% btips
             if(sub_coverage <= 1){ # percent
               
@@ -241,7 +270,6 @@ filter_GD_by_coverage <- function(
           }
           ress<-rbind(ress,res)
           
-
           # plot trees
           # in "detect_out" extracts subtree include up-two-nodes
           # here can just extract subtree
@@ -249,9 +277,11 @@ filter_GD_by_coverage <- function(
           # prepare tip colors
           tipcol<-rep("black",length(atree$tip.label))
           tips<-atree$tip.label
-          tips<-lapply(tips,function(xx)
-            unlist(strsplit(xx,split = split,fixed = TRUE))[1])
-          tips<-unlist(tips)
+          if(!is.null(split)){
+            tips<-lapply(tips,function(xx)
+              unlist(strsplit(xx,split = split,fixed = TRUE))[1])
+            tips<-unlist(tips)
+          }
           # color basal tips in green
           w<-which(tips %in% btips);w
           if(length(w) > 0){tipcol[w]<-"green"}
@@ -290,7 +320,7 @@ filter_GD_by_coverage <- function(
   grDevices::dev.off()
   #
   saveRDS(ntrees,paste("ntrees_",wgdt,".rds",sep=""))
-  write.table(ress,paste("Include_or_not_",wgdt,".txt",sep=""),
+  write.table(ress,paste("Meet_coverage_or_not_",wgdt,".txt",sep=""),
               quote = FALSE,col.names = TRUE,row.names = FALSE)
   # ress contains, for each gd, TRUE or FALSE to have the outgroup
   # the first column is the tree id, the second column is TREU/FALSE
@@ -301,7 +331,7 @@ filter_GD_by_coverage <- function(
   lw<-length(w) # length of having closest outgroups
   lt<-length(tar) # length of all gd
   sum<-c(wgdt,lw,lt,round(lw/lt,3))
-  names(sum)<-c("wgd_node","having_out","total","percent")
+  names(sum)<-c("wgd_node","meet_coverage","total","percent")
   cat(sum,sep=", ")
   cat("\n")
   r<-ress[w,1]
@@ -310,7 +340,7 @@ filter_GD_by_coverage <- function(
   page<-w
   trn<-r
   dd<-data.frame(page=page,tree=trn)
-  write.table(dd,paste("Trees_have_basal_tips_",wgdt,".txt",sep=""),
+  write.table(dd,paste("Trees_meet_coverage_",wgdt,".txt",sep=""),
               sep="\t",quote = FALSE,col.names = TRUE,
               row.names = FALSE)
   
