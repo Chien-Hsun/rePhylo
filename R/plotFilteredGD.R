@@ -25,7 +25,7 @@
 #' @importFrom ggtree ggtree
 #' @importFrom ggtree geom_tiplab
 #' @importFrom ggtree geom_label2
-#' @importFrom ggtree xlim
+#' @importFrom ggplot2 xlim
 #' @importFrom ggplot2 theme
 #' @importFrom ggplot2 labs
 
@@ -114,11 +114,10 @@ plotFilteredGD <-
     ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
   
   if(!is.null(xlim)){
-    gg <- gg + ggtree::xlim(xlim[1], xlim[2])
+    gg <- gg + ggplot2::xlim(xlim[1], xlim[2])
   }
   
-  print(gg)
+  gg
 
-  return(gg)
 }
 
