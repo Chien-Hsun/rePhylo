@@ -123,6 +123,7 @@ filter_GD_by_coverage <- function(
   pdfwid = pdfwid, pdflen = pdflen){
   
   wgdt <- phyto_node[x,1]
+  wnode <- phyto_node[x,2]
   # for one phyto_xxx
   w <- which(gdtable[ ,3] == wgdt)
   length(w)
@@ -219,7 +220,9 @@ filter_GD_by_coverage <- function(
         
         options(warn = 1)
         mrca<-ape::getMRCA(tr,tip = pair);mrca
-        if(mrca != phangorn::getRoot(tr)){
+#        if(mrca != phangorn::getRoot(tr)){
+        # for filter_GD_by_coverage,
+        # mrca == root is fine.
           des<-phangorn::Descendants(tr,node = mrca,
                                      type = "children");des
           # filter for the two des 
@@ -301,17 +304,17 @@ filter_GD_by_coverage <- function(
           names(alist) <- paste(ntreenames[i], ", gd = ", 
                               pn, sep="")
           ntrees <- append(ntrees,alist)
-        } else {
-          war <- paste(ntreenames[i], ", gd ", 
-                       pn, " has mrca == root.", sep="")
-          warning(war)
-          res <- c(war, " ", " ")
-          ress <- rbind(ress, res)
-          trr <- list(tr)
-          names(trr) <- paste(ntreenames[i], ", gd = ", 
-                              pn, sep="")
-          ntrees <- append(ntrees, trr)
-        }
+#        } else {
+#          war <- paste(ntreenames[i], ", gd ", 
+#                       pn, " has mrca == root.", sep="")
+#          warning(war)
+#          res <- c(war, " ", " ")
+#          ress <- rbind(ress, res)
+#          trr <- list(tr)
+#          names(trr) <- paste(ntreenames[i], ", gd = ", 
+#                              pn, sep="")
+#          ntrees <- append(ntrees, trr)
+#        }
       } # for gd
       
     } # if tree is not NULL
@@ -330,8 +333,8 @@ filter_GD_by_coverage <- function(
   w<-which(tar == "TRUE")
   lw<-length(w) # length of having closest outgroups
   lt<-length(tar) # length of all gd
-  sum<-c(wgdt,lw,lt,round(lw/lt,3))
-  names(sum)<-c("wgd_node","meet_coverage","total","percent")
+  sum<-c(wgdt,wnode,lw,lt,round(lw/lt,3))
+  names(sum)<-c("phyto","node","meet_coverage","total","percent")
   cat(sum,sep=", ")
   cat("\n")
   r<-ress[w,1]

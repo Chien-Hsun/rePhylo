@@ -168,11 +168,11 @@ concor.node <- function(ref, trees, bp = 0, getTreeNames = FALSE, node = NULL){
   conTreesl <- con_results <- data <- vector("list", length(setBPs))
   names(conTreesl) <- names(data) <- names(con_results) <- setBPs
 
-  # to get the .denominator of ref nodes,
+  # to get the denominator of ref nodes,
   # i.e. how many trees have tips that can define this node
   # rationale: below the target node, both of the the two child clades (tips) have at least one tip for each subclade...
   # regardless of structure, so even unrooted tree is fine
-  dres <- lapply(trees, function(x) .denominator(x, ref, refinfo))
+  dres <- lapply(trees, function(x) denominator(x, ref, refinfo))
   # first level as trees, second as nodes
 
   # to get the number of denominators (the number of trees that have the "node" on ref)

@@ -25,7 +25,6 @@
 #' @param bp a numeric specify the minimum bp value for the node.
 #'     Defaults to \code{NULL}.  
 #' @export
-#' @noRd
 #' @importFrom ape extract.clade
 #' @importFrom phangorn Descendants
 #' @seealso \code{\link{concor.node}} 
@@ -36,7 +35,7 @@
 # because ".denominator uses ref tree to do "Descendant" and "extract.clade"
 # so it is no problem for trees may not be rooted
 
-.denominator <- function(x, ref, refinfo, split = NULL, 
+denominator <- function(x, ref, refinfo, split = NULL, 
                          c.out = FALSE, sub_coverage = NULL, 
                          max.tip = NULL, bp = NULL){
   
@@ -49,7 +48,7 @@
   }
   
   rres <- lapply(allnodes, function(xx) 
-    deno(xx = xx, ref = ref, 
+    .deno(xx = xx, ref = ref, 
          testtree = x, testtips = testtips, 
          c.out = c.out, split = split,
          sub_coverage = sub_coverage, 
@@ -63,7 +62,7 @@
 
 
 ###########################
-# deno
+# .deno
 # main internal^2 function
 #' @title internal function
 #' @description Internal function of \code{rePhylo}
@@ -87,13 +86,12 @@
 #' @param bp a numeric specify the minimum bp value for the node.
 #'     Defaults to \code{NULL}.  
 #' @export
-#' @noRd
 #' @importFrom ape extract.clade
 #' @importFrom phangorn Descendants
 #' @seealso \code{\link{concor.node}} 
 #'     \code{\link{detect_closest_out_for_GD}}
 #'     \code{\link{filter_GD_by_coverage}}
-deno <- function(xx, ref, testtree, testtips, c.out, split,
+.deno <- function(xx, ref, testtree, testtips, c.out, split,
                  sub_coverage, max.tip, bp){
   nod <- xx # node of ref tip
   rlen <- length(ref$tip.label)
@@ -242,8 +240,6 @@ deno <- function(xx, ref, testtree, testtips, c.out, split,
     print(paste(xx, "FALSE", sep=" "))
     return(FALSE)
   }
-  
-  head(subclade_id); length(subclade_id)
   
   # discard the subclade_id that is root
   root <- phangorn::getRoot(testtree)

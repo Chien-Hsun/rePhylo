@@ -8,7 +8,7 @@ Author: Chien-Hsun Huang [aut, cre],
     Wen-Yu Kuo [aut]
 Maintainer: Chien-Hsun Huang <chhuang1981@gmail.com>
 Depends: R (>= 3.3.0)
-Imports: ape (>= 5.0), stats, utils, methods, grDevices, graphics, phangorn, ggplot2, RColorBrewer
+Imports: ape (>= 5.0), stats, utils, methods, grDevices, graphics, phangorn, ggplot2, ggtree, RColorBrewer
 Description: This package aims to provide a phylogenetic methods to filter out potential 
     paralogs or sequences with misleading signals by 
     Use four spaces when indenting paragraphs within the Description.

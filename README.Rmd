@@ -21,11 +21,11 @@ print(barc$groupings)
 
 ## Overview
 
-This package is to improve phylogenies based on phylogenies. One of the main function is to select potential paralogs by given groupings / constraints, and the users can perform another turn of phylogenetic reconstructions for an improved phylogeny. 
+This package is desinged for improving phylogenies and related analyses based on phylogenies. One of the main function is to select potential paralogs by given groupings / constraints, either for another turn of phylogenetic reconstructions for an improved phylogeny, or for in-depth analysis for the phylogenetic inconsistencies. 
 
 ## Description and notes
-`cladeFilter` reports tips as potential paralogs that violate the groupings provided in `taxa` for each gene tree of `trees`. Users can provide `taxa` directly, or generate one by `concor.node` and `createGrouping`.
-**IMPORTANT NOTE:** The grouping/constraints must be chosen very carefully.  Avoid any aribitrary selections of particular relatioships; suggested to use the well-confirmed relationship, unless for special purpose.
+`cladeFilter` reports,  for each gene tree of `trees`, tips as potential paralogs that separate from others in the same groupings provided in `taxa`. Users can provide `taxa` directly, or generate one by `concor.node` and `createGrouping`.
+**IMPORTANT NOTE:** The grouping/constraints must be chosen with caution.  Avoid any aribitrary selections of particular relatioships; use well-confirmed relationship unless for special purpose.
 
 ## Installation
 ```{r install}
@@ -73,19 +73,6 @@ head(taxa)
 
 
 
+... This page is under construction
 
 
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
-
-
-
-
-
-For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
