@@ -11,6 +11,7 @@
 #' @importFrom methods hasArg
 #' @importFrom ape di2multi
 
+
 # create an unresolved tree as ref from the result of concor.node, to be used in cladeFilter
 createUnref <- function(concor, bp, percent){
   if(!inherits(concor, "concor"))

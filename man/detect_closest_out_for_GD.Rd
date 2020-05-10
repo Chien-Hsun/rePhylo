@@ -5,7 +5,8 @@
 \title{Detect the existence of the closest outgroups for each gd}
 \usage{
 detect_closest_out_for_GD(
-  phyto_node,
+  phyto,
+  node,
   trees,
   gdtable,
   sptree,
@@ -13,12 +14,15 @@ detect_closest_out_for_GD(
   tree_id_tab,
   up_one_node = FALSE,
   pdfwid = 10,
-  pdflen = 30
+  pdflen = 30,
+  mc.cores = 4
 )
 }
 \arguments{
-\item{phyto_node}{a table with the first column as the phyto id given by Tree2GD and 
-the second column as the node id from \code{ape}.}
+\item{phyto}{the phyto id for the analysis.}
+
+\item{node}{a numeric indicating the target node id as in \code{ape}.
+An alternative arg of \code{phyto}.}
 
 \item{trees}{a list of objects of class "\code{phylo}".
 A list of gene trees to be examined. Can be unrooted.}
@@ -40,6 +44,8 @@ closest outgroup, as a second step of investigation. Default \code{FALSE}.}
 \item{pdfwid}{the width of pdf file for subtrees. Default \code{10}.}
 
 \item{pdflen}{the length of pdf file for subtrees. Default \code{30}.}
+
+\item{mc.cores}{the number of cores used for mclapply. Defaults to \code{4}.}
 }
 \description{
 \code{detect_closest_out_for_GD} is to find out whether each gd 
@@ -59,7 +65,7 @@ For each gd, detect whether there are closest outgroups
 \dontrun{
 res<-
 detect_closest_out_of_GD(
-phyto_node,trees = trees,gdtable = gdtable,
+phyto,trees = trees,gdtable = gdtable,
 sptree = sptree,split=".",tree_id_tab = tree_id_tab,
 up_one_node=FALSE,pdfwid = 20,pdflen = 100)
 

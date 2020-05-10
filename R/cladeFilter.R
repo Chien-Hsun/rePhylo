@@ -60,6 +60,7 @@
 
 
 
+
 cladeFilter <- function(trees, taxa, level = NULL, write.table = TRUE){
   # removing "warn = FALSE"
 
@@ -190,7 +191,7 @@ cladeFilter <- function(trees, taxa, level = NULL, write.table = TRUE){
   err <- xx$name
   isroot <- unlist(lapply(trees, ape::is.rooted))
   if(!all(isroot)){
-    trees <- lapply(trees,function(zz) root.dist(z = zz, tar = group[,1]))
+    trees <- lapply(trees,function(zz) root_dist(z = zz, tar = group[,1]))
   }
 
   for(z in 1:length(trees)){
@@ -209,7 +210,7 @@ cladeFilter <- function(trees, taxa, level = NULL, write.table = TRUE){
 
     if(is.null(tree)){
       # if there is no any tip of this group in the test tree
-      # a NULL will be returned to trees by "root.dist"
+      # a NULL will be returned to trees by "root_dist"
 
       subtree <- NULL
       mrcaInTree <- NULL

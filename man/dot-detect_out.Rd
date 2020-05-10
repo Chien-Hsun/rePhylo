@@ -5,8 +5,8 @@
 \title{Internal. Detect the existence of the closest outgroups for each gd}
 \usage{
 .detect_out(
-  x,
-  phyto_node,
+  phyto,
+  node,
   trees,
   gdtable,
   sptree,
@@ -18,10 +18,10 @@
 )
 }
 \arguments{
-\item{x}{the row of phyto_node to be tested}
+\item{phyto}{the phyto id for the analysis.}
 
-\item{phyto_node}{a table with the first column as the phyto id given by Tree2GD and 
-the second column as the node id from \code{ape}.}
+\item{node}{a numeric indicating the target node id as in \code{ape}.
+An alternative arg of \code{phyto}.}
 
 \item{trees}{a list of objects of class "\code{phylo}".
 A list of gene trees to be examined.}

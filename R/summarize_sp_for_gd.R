@@ -116,6 +116,7 @@ summarize_sp_for_GD <-
       }
       cols
       
+      
       # to make x-y dotplot
       g1<-
         ggplot2::ggplot(data = mdata, 

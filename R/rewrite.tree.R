@@ -4,8 +4,7 @@
 #' @param tree tree
 #' @export
 #' @keywords internal
-#' @seealso \code{\link{root.dist}}, \code{\link[ape]{root.phylo}}
-
+#' @seealso \code{\link{root_dist}}, \code{\link[ape]{root.phylo}}
 
 # to get the post ordered tree without write out a file
 # applicable for root, ladderize, rotateConstr, ...etc

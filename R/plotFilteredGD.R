@@ -20,14 +20,20 @@
 #' @param color two characters specify the colors for node labels. The first is 
 #'     for node above the threshold, and the second is for those below.
 #' @param tip.offset offset of tip labels in \code{ggtree}. Defaults to \code{NULL}.
+#' @param plot.margin four numeric indicate plot margin. Defaults to \code{c(6, 140, 6, 6)}. 
 #' @param xlim used as the x scale in \code{ggtree}.
+#' @param node.cex size of node labels.
 #' @export
 #' @importFrom ggtree ggtree
 #' @importFrom ggtree geom_tiplab
 #' @importFrom ggtree geom_label2
+#' @importFrom ggtree theme_tree2
 #' @importFrom ggplot2 xlim
 #' @importFrom ggplot2 theme
 #' @importFrom ggplot2 labs
+#' @importFrom ggplot2 aes
+#' @importFrom ggplot2 coord_cartesian
+
 
 plotFilteredGD <- 
   function(tree, gd, deno,
@@ -36,6 +42,8 @@ plotFilteredGD <-
            thres_percent = 5,
            color = c("red", "yellow"),
            tip.offset = NULL,
+           node.cex = 1,
+           plot.margin = c(6, 140, 6, 6),
            xlim = NULL){
   
   cat("Making tree plot using ggtree.....\n")
@@ -96,7 +104,7 @@ plotFilteredGD <-
   labred[whichred] <- TRUE; labred
   labyel[whichyel] <- TRUE; labyel
   labyel[c(1:ll)] <- FALSE # don't label tips
-  
+
   tree2$node.label <- as.character(tab[ ,"lab"])
   
   if(is.null(tip.offset)){
@@ -107,9 +115,11 @@ plotFilteredGD <-
   gg <- g +
     ggtree::geom_tiplab(offset = tip.offset) +
     ggtree::geom_label2(ggplot2::aes(label = label, subset = labred), #label %in% label[grep(label,pattern="%")] & tfc == "TRUE" & tfp == "TRUE"),
-                bg = color[1])+
+                bg = color[1], size = node.cex) +
     ggtree::geom_label2(ggplot2::aes(label = label, subset = labyel), #label %in% label[grep(label,pattern="%")] & -whichc & -whichp),
-                bg = color[2])+
+                bg = color[2], size = node.cex) +
+    ggplot2::coord_cartesian(clip = "off") + 
+    ggtree::theme_tree2(plot.margin = ggtree::margin(plot.margin)) +
     ggplot2::labs(title = "corrected_w_sub_coverage") +
     ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
   
@@ -117,7 +127,8 @@ plotFilteredGD <-
     gg <- gg + ggplot2::xlim(xlim[1], xlim[2])
   }
   
-  gg
+  print(gg)
 
+  return(tab)
 }
 

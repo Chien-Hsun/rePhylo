@@ -17,6 +17,7 @@
 #'     Defaults to "\code{rect}".
 #' @param ... other arguments to be passed to \code{plot} or to \code{plot.phylo}.
 #' @export
+#' @method plot concor
 #' @importFrom ape plot.phylo
 #' @importFrom ape nodelabels
 #' @importFrom RColorBrewer brewer.pal
@@ -27,7 +28,6 @@
 #'     pcakage) will be called to produce \code{levelcol}. Length of \code{thres} must be one
 #'     more than \code{levelcol}.
 #' @seealso \code{\link{concor.node}}, \code{\link[ape]{plot.phylo}}
-
 
 
 # bg will not be functional when thres or levelcol is provided

@@ -14,6 +14,6 @@ Internal function of \code{youshu}. Make the numbering of nodes and tips of a re
     as re-read in.
 }
 \seealso{
-\code{\link{root.dist}}, \code{\link[ape]{root.phylo}}
+\code{\link{root_dist}}, \code{\link[ape]{root.phylo}}
 }
 \keyword{internal}

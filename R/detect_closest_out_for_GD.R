@@ -10,8 +10,9 @@
 #'     also produce pdf files plotting subclade of each gd, with tips colored, 
 #'     for easier manual investigation when required.
 #'
-#' @param phyto_node a table with the first column as the phyto id given by Tree2GD and 
-#'     the second column as the node id from \code{ape}.
+#' @param phyto the phyto id for the analysis.
+#' @param node a numeric indicating the target node id as in \code{ape}.
+#'     An alternative arg of \code{phyto}.
 #' @param trees a list of objects of class "\code{phylo}".
 #'     A list of gene trees to be examined. Can be unrooted.
 #' @param gdtable a \code{data.frame} of the gd table file provided by Tree2GD.
@@ -25,7 +26,9 @@
 #'     closest outgroup, as a second step of investigation. Default \code{FALSE}.
 #' @param pdfwid the width of pdf file for subtrees. Default \code{10}.
 #' @param pdflen the length of pdf file for subtrees. Default \code{30}.
+#' @param mc.cores the number of cores used for mclapply. Defaults to \code{4}.
 #' @export
+#' @importFrom parallel mclapply
 #' @details For each gd, detect whether there are closest outgroups
 #'    exactly next to the duplicated node, that can actually define 
 #'    the gd at the indicated node. Otherwise, gd will be possible 
@@ -34,7 +37,7 @@
 #' \dontrun{
 #' res<-
 #' detect_closest_out_of_GD(
-#' phyto_node,trees = trees,gdtable = gdtable,
+#' phyto,trees = trees,gdtable = gdtable,
 #' sptree = sptree,split=".",tree_id_tab = tree_id_tab,
 #' up_one_node=FALSE,pdfwid = 20,pdflen = 100)
 #' 
@@ -43,9 +46,9 @@
 
 # only for lapply
 detect_closest_out_for_GD <- function(
-  phyto_node, trees, gdtable, sptree, split, 
+  phyto, node, trees, gdtable, sptree, split, 
   tree_id_tab, up_one_node = FALSE, 
-  pdfwid = 10, pdflen = 30){
+  pdfwid = 10, pdflen = 30, mc.cores = 2){
   
   # check if tree names matched
   t1 <- names(trees)
@@ -55,14 +58,33 @@ detect_closest_out_for_GD <- function(
     stop("Names in tree list are different from the tree_id_tab.")
   }
   
-  sum<-lapply(1:nrow(phyto_node),function(z) 
-    .detect_out(z, phyto_node,trees, 
-                gdtable,sptree,
-                split,
-                tree_id_tab,
+  
+  if(missing(phyto) && missing(node)){
+    stop("Missing both phyto ids and node ids.\n")
+  }
+  
+  if(hasArg(node)){
+    phyto <- NULL
+    len <- length(node)
+  }
+  
+  if(hasArg(phyto)){
+    node <- NULL
+    len <- length(phyto)
+  }
+  
+  sum<-parallel::mclapply(c(1:len), function(z) {
+    .detect_out(phyto = phyto[z],
+                node = node[z],
+                trees = trees, 
+                gdtable = gdtable,
+                sptree = sptree,
+                split = split,
+                tree_id_tab = tree_id_tab,
                 up_one_node = up_one_node,
                 pdfwid = pdfwid,
-                pdflen = pdflen))
+                pdflen = pdflen)
+  }, mc.cores = mc.cores)
 
   return(sum)
 }
@@ -80,9 +102,9 @@ detect_closest_out_for_GD <- function(
 #'     also produce pdf files plotting subclade of each gd, with tips colored, 
 #'     for easier manual investigation when required.
 #'
-#' @param x the row of phyto_node to be tested
-#' @param phyto_node a table with the first column as the phyto id given by Tree2GD and 
-#'     the second column as the node id from \code{ape}.
+#' @param phyto the phyto id for the analysis.
+#' @param node a numeric indicating the target node id as in \code{ape}.
+#'     An alternative arg of \code{phyto}.
 #' @param trees a list of objects of class "\code{phylo}".
 #'     A list of gene trees to be examined.
 #' @param gdtable a \code{data.frame} of the gd table file provided by Tree2GD.
@@ -115,13 +137,30 @@ detect_closest_out_for_GD <- function(
 #' @keywords internal function
 #' @seealso \code{\link{detect_closest_out_for_GD}}
 
+
 .detect_out<-function(
-  x, phyto_node, trees, gdtable, sptree,
+  phyto, node, trees, gdtable, sptree,
   split, tree_id_tab, up_one_node = up_one_node,
   pdfwid = pdfwid, pdflen = pdflen){
   
-  wgdt <- phyto_node[x,1]
-  # for one phyto_xxx
+  # prepare node id table
+  phyto_tab <- make.idTable.phyto(sptree)
+  
+  if(!is.null(phyto) && !is.null(node)){
+    cat("Both \"phyto\" and \"node\" are given. Use \"phyto\" for the analysis.\n")
+  }
+  
+  if(!is.null(node)){
+    wgdt <- phyto_tab[which(as.numeric(phyto_tab[ ,2]) == node), 1]
+    wnode <- node
+  }
+  
+  if(!is.null(phyto)){
+    wgdt <- phyto
+    wnode <- phyto_tab[which(phyto_tab[,1] == phyto), 2]
+    wnode <- as.numeric(wnode)
+  }
+  
   w <- which(gdtable[ ,3] == wgdt)
   length(w)
   p109 <- gdtable[w, ]
@@ -158,8 +197,7 @@ detect_closest_out_for_GD <- function(
   
   
   # get basal tips
-  w<-which(phyto_node[,1] == wgdt)
-  bnode<-as.numeric(phyto_node[w,2])
+  bnode<-as.numeric(wnode)
   anc<-phangorn::Ancestors(sptree,node = bnode,type = "parent")
   des<-phangorn::Descendants(sptree,node = anc,type = "children")
   des<-des[-which(des == bnode)]
@@ -213,7 +251,7 @@ detect_closest_out_for_GD <- function(
         
         # root by the most distant node
         #      options(warn=-1)
-        tr<-root.dist(tr,tar = pair)
+        tr<-root_dist(tr,tar = pair)
         tr<-rewrite.tree(ape::ladderize(tr,right=FALSE))
         
         options(warn=1)

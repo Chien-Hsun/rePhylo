@@ -8,11 +8,11 @@
 #'     to \code{c(0.5, 0.5)}. Also see \code{plot.phylo}.
 #' @param ... other arguments to be passed to \code{plot} or to \code{plot.phylo}.
 #' @export
+#' @method plot cladeFilter
 #' @importFrom ape plot.phylo
 #' @importFrom methods hasArg
 #' @importFrom graphics title
 #' @seealso \code{\link{cladeFilter}}, \code{\link[ape]{plot.phylo}}
-
 
 # to plot trees after cladeFilter process
 # input "x" as an object of "cladeFilter" but not "a list of cladeFilter"

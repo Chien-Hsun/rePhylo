@@ -31,7 +31,6 @@
 #' taxa <- createGrouping(concor.n, percent = 0.7)
 #' }
 
-
 createGrouping <- function(concor, percent = 0.5, count = NULL, bp = NULL, nodes = NULL){
 
   if(!inherits(concor, "concor"))

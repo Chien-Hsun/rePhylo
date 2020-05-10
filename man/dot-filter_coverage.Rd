@@ -6,8 +6,8 @@
     each of the duplicated subclades}
 \usage{
 .filter_coverage(
-  x,
-  phyto_node,
+  phyto,
+  node,
   trees,
   gdtable,
   sptree,
@@ -16,15 +16,16 @@
   split,
   tree_id_tab,
   up_one_node = up_one_node,
+  plot = plot,
   pdfwid = pdfwid,
   pdflen = pdflen
 )
 }
 \arguments{
-\item{x}{the row of phyto_node to be tested}
+\item{phyto}{the phyto id for the analysis.}
 
-\item{phyto_node}{a table with the first column as the phyto id given by Tree2GD and 
-the second column as the node id from \code{ape}.}
+\item{node}{a numeric indicating the target node id as in \code{ape}.
+An alternative arg of \code{phyto}.}
 
 \item{trees}{a list of objects of class "\code{phylo}".
 A list of gene trees to be examined.}
@@ -50,6 +51,8 @@ is the tree names.}
 
 \item{up_one_node}{logical. Whether to choose tips of one node deeper as the 
 closest outgroup, as a second step of investigation. Default \code{FALSE}.}
+
+\item{plot}{whether to plot subclades. Defaults to \code{FALSE}.}
 
 \item{pdfwid}{the width of pdf file for subtrees. Default \code{10}.}
 

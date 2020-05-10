@@ -7,8 +7,9 @@
 #' @description \code{filter_GD_by_coverage} is to identify for each gd whether the two 
 #'     duplicated subclades contains species number more than a given level.
 #'
-#' @param phyto_node a table with the first column as the phyto id given by Tree2GD and 
-#'     the second column as the node id from \code{ape}.
+#' @param phyto the phyto id for the analysis.
+#' @param node a numeric indicating the target node id as in \code{ape}.
+#'     An alternative arg of \code{phyto}.
 #' @param trees a list of objects of class "\code{phylo}".
 #'     A list of gene trees to be examined. Can be unrooted.
 #' @param gdtable a \code{data.frame} of the gd table file provided by Tree2GD.
@@ -25,10 +26,13 @@
 #'     corresponding tree file. The first column is the id, and the second column
 #'     is the tree names. 
 #' @param up_one_node logical. Whether to choose tips of one node deeper as the 
-#'     closest outgroup, as a second step of investigation. Default \code{FALSE}.
-#' @param pdfwid the width of pdf file for subtrees. Default \code{10}.
-#' @param pdflen the length of pdf file for subtrees. Default \code{30}.
+#'     closest outgroup, as a second step of investigation. Defaults to \code{FALSE}.
+#' @param plot whether to plot subclades. Defaults to \code{FALSE}.
+#' @param pdfwid the width of pdf file for subtrees. Defaults to \code{10}.
+#' @param pdflen the length of pdf file for subtrees. Defaults to \code{30}.
+#' @param mc.cores the number of cores used for mclapply. Defaults to \code{4}.
 #' @export
+#' @importFrom parallel mclapply
 #' @details returns a pdf plotting the gd clades, with gd pairs 
 #'     in red and other species in the same clade in sptree in green.
 #'     A file with prefix "Include_or_not_" indicates for each tree 
@@ -39,10 +43,10 @@
 
 # only for lapply
 filter_GD_by_coverage <- function(
-  phyto_node, trees, gdtable, sptree, split, 
+  phyto, node, trees, gdtable, sptree, split, 
   tree_id_tab, sub_coverage = NULL, max.tip = NULL,
-  up_one_node = FALSE, 
-  pdfwid = 10, pdflen = 30){
+  up_one_node = FALSE, plot = FALSE,
+  pdfwid = 10, pdflen = 30, mc.cores = 2){
   
   # check if tree names matched
   t1 <- names(trees)
@@ -52,21 +56,50 @@ filter_GD_by_coverage <- function(
     stop("Names in tree list are different from the tree_id_tab.")
   }
   
-  sum<-lapply(1:nrow(phyto_node),function(z) 
-    .filter_coverage(x = z, 
-                phyto_node = phyto_node,
-                trees = trees, 
-                gdtable = gdtable,
-                sptree = sptree,
-                sub_coverage = sub_coverage, 
-                max.tip = max.tip,
-                split = split, 
-                tree_id_tab = tree_id_tab,
-                up_one_node = up_one_node,
-                pdfwid = pdfwid,
-                pdflen = pdflen))
+  if(missing(phyto) && missing(node)){
+    stop("Missing both phyto ids and node ids.\n")
+  }
+  
+  if(hasArg(node)){
+    phyto <- NULL
+    len <- length(node)
+  }
+  
+  if(hasArg(phyto)){
+    node <- NULL
+    len <- length(phyto)
+  }
+  
+  sum <- parallel::mclapply(c(1:len), function(z) {
+    .filter_coverage(phyto = phyto[z],
+                     node = node[z],
+                     trees = trees, 
+                     gdtable = gdtable,
+                     sptree = sptree,
+                     sub_coverage = sub_coverage, 
+                     max.tip = max.tip,
+                     split = split, 
+                     tree_id_tab = tree_id_tab,
+                     up_one_node = up_one_node,
+                     plot = plot,
+                     pdfwid = pdfwid,
+                     pdflen = pdflen)
+  }, mc.cores = mc.cores)
 
-  return(sum)
+  # combine all res into one table
+  res_tab <- c()
+  for(i in 1:length(sum)){
+    rr <- sum[[i]]
+    res_tab <- rbind(res_tab, rr)
+  }
+  row.names(res_tab) <- NULL
+  
+  # write result
+  write.table(res_tab, "summary_sub_coverage.txt",
+              quote = FALSE, row.names = FALSE,
+              col.names = TRUE, sep = "\t")
+  
+  return(res_tab)
 }
 
 
@@ -79,9 +112,9 @@ filter_GD_by_coverage <- function(
 #'     to identify for each gd whether the two 
 #'     duplicated subclades contains species number more than a given level.
 #'
-#' @param x the row of phyto_node to be tested
-#' @param phyto_node a table with the first column as the phyto id given by Tree2GD and 
-#'     the second column as the node id from \code{ape}.
+#' @param phyto the phyto id for the analysis.
+#' @param node a numeric indicating the target node id as in \code{ape}.
+#'     An alternative arg of \code{phyto}.
 #' @param trees a list of objects of class "\code{phylo}".
 #'     A list of gene trees to be examined.
 #' @param gdtable a \code{data.frame} of the gd table file provided by Tree2GD.
@@ -99,6 +132,7 @@ filter_GD_by_coverage <- function(
 #'     is the tree names. 
 #' @param up_one_node logical. Whether to choose tips of one node deeper as the 
 #'     closest outgroup, as a second step of investigation. Default \code{FALSE}.
+#' @param plot whether to plot subclades. Defaults to \code{FALSE}.
 #' @param pdfwid the width of pdf file for subtrees. Default \code{10}.
 #' @param pdflen the length of pdf file for subtrees. Default \code{30}.
 #' @export
@@ -117,16 +151,45 @@ filter_GD_by_coverage <- function(
 #' @seealso \code{\link{filter_GD_by_coverage}}
 
 .filter_coverage<-function(
-  x, phyto_node, trees, gdtable, sptree, sub_coverage,
+  phyto, node, trees, gdtable, sptree, sub_coverage,
   max.tip, 
   split, tree_id_tab, up_one_node = up_one_node,
+  plot = plot,
   pdfwid = pdfwid, pdflen = pdflen){
   
-  wgdt <- phyto_node[x,1]
-  wnode <- phyto_node[x,2]
+  # prepare node id table
+  phyto_tab <- make.idTable.phyto(sptree)
+  
+  if(!is.null(phyto) && !is.null(node)){
+    cat("Both \"phyto\" and \"node\" are given. Use \"phyto\" for the analysis.\n")
+  }
+  
+  if(!is.null(node)){
+    wgdt <- phyto_tab[which(as.numeric(phyto_tab[ ,2]) == node), 1]
+    wnode <- node
+  }
+  
+  if(!is.null(phyto)){
+    wgdt <- phyto
+    wnode <- phyto_tab[which(phyto_tab[,1] == phyto), 2]
+    wnode <- as.numeric(wnode)
+  }
+  
+  cat(wgdt, wnode,"\n")
+  
   # for one phyto_xxx
   w <- which(gdtable[ ,3] == wgdt)
-  length(w)
+  
+  # if no any gd pairs
+  if(length(w) == 0){
+    sum<-c(wgdt,wnode,numeric(3))
+    names(sum)<-c("phyto","node","meet_coverage","total","percent")
+    cat(sum,sep=", ")
+    cat("\n")
+    
+    return(sum)
+  }
+  
   p109 <- gdtable[w, ]
   # grep trees
   ttrees <- p109[ ,1]
@@ -160,9 +223,7 @@ filter_GD_by_coverage <- function(
   }
   
   # get target clade tips
-  w<-which(phyto_node[,1] == wgdt)
-  node<-as.numeric(phyto_node[w,2])
-  st<-ape::extract.clade(sptree,node = node)
+  st<-ape::extract.clade(sptree,node = wnode)
   btips<-st$tip.label
   if(!is.null(sub_coverage)){
     if(length(btips) < sub_coverage){ 
@@ -215,8 +276,8 @@ filter_GD_by_coverage <- function(
         
         # root by the most distant node
         #      options(warn=-1)
-        tr<-root.dist(tr,tar = pair)
-        tr<-rewrite.tree(ape::ladderize(tr,right=FALSE))
+        tr <- root_dist(tr,tar = pair)
+        tr <- rewrite.tree(ape::ladderize(tr,right=FALSE))
         
         options(warn = 1)
         mrca<-ape::getMRCA(tr,tip = pair);mrca

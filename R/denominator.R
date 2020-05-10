@@ -2,13 +2,12 @@
 # 2020.05.05 modified
 # for correct structure for the nodes
 # and moved as a separate file
-
 ###########################################################################
 #' @title internal function
 #' @description Internal function of \code{rePhylo}
-#' @param x x
-#' @param ref ref
-#' @param refinfo refinfo
+#' @param tree a test tree
+#' @param node id of node(s) to be corrected (as \code{ape} id)
+#' @param ref species tree
 #' @param split a character indicates the symbol used to separate
 #'     species names and gene id for gene family trees. 
 #'     Defaults to \code{NULL}.
@@ -31,16 +30,20 @@
 #'     \code{\link{detect_closest_out_for_GD}}
 #'     \code{\link{filter_GD_by_coverage}}
 
-# x is each single gene tree
 # because ".denominator uses ref tree to do "Descendant" and "extract.clade"
 # so it is no problem for trees may not be rooted
 
-denominator <- function(x, ref, refinfo, split = NULL, 
+denominator <- function(tree, node, ref, split = NULL, 
                          c.out = FALSE, sub_coverage = NULL, 
                          max.tip = NULL, bp = NULL){
   
-  allnodes <- refinfo$tdata[ ,1]
-  testtips <- x$tip.label
+  if(missing(node)){
+    allnodes <- ref$edge[ref$edge[ ,2] > length(ref$tip.label), 2]
+  } else {
+    allnodes <- node
+  }
+  
+  testtips <- tree$tip.label
   if(!is.null(split)){ # for gene family trees
     testtips <- lapply(testtips, function(xx) 
       unlist(strsplit(xx, split = split, fixed = TRUE))[1])
@@ -49,7 +52,7 @@ denominator <- function(x, ref, refinfo, split = NULL,
   
   rres <- lapply(allnodes, function(xx) 
     .deno(xx = xx, ref = ref, 
-         testtree = x, testtips = testtips, 
+         testtree = tree, testtips = testtips, 
          c.out = c.out, split = split,
          sub_coverage = sub_coverage, 
          max.tip = max.tip, bp = bp))

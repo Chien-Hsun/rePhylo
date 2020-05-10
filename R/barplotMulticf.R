@@ -40,7 +40,6 @@
 #' }
 
 
-
 # 0801:
 # include this function into "summarize.multiccf
 # but still to export the function (just as suggested by "Writing R Extensions")

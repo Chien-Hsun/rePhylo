@@ -15,6 +15,8 @@ plotFilteredGD(
   thres_percent = 5,
   color = c("red", "yellow"),
   tip.offset = NULL,
+  node.cex = 1,
+  plot.margin = c(6, 140, 6, 6),
   xlim = NULL
 )
 }
@@ -41,6 +43,10 @@ as red. Defaults to \code{5}}
 for node above the threshold, and the second is for those below.}
 
 \item{tip.offset}{offset of tip labels in \code{ggtree}. Defaults to \code{NULL}.}
+
+\item{node.cex}{size of node labels.}
+
+\item{plot.margin}{four numeric indicate plot margin. Defaults to \code{c(6, 140, 6, 6)}.}
 
 \item{xlim}{used as the x scale in \code{ggtree}.}
 }

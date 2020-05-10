@@ -38,7 +38,6 @@
 
 
 
-
 # for multiple constraints (groupings)
 # there might be duplicated occurrences for some tips in different constraints
 # either both removed or just removed by one constraint

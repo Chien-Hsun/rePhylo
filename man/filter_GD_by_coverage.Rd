@@ -6,7 +6,8 @@
     each of the duplicated subclades}
 \usage{
 filter_GD_by_coverage(
-  phyto_node,
+  phyto,
+  node,
   trees,
   gdtable,
   sptree,
@@ -15,13 +16,17 @@ filter_GD_by_coverage(
   sub_coverage = NULL,
   max.tip = NULL,
   up_one_node = FALSE,
+  plot = FALSE,
   pdfwid = 10,
-  pdflen = 30
+  pdflen = 30,
+  mc.cores = 4
 )
 }
 \arguments{
-\item{phyto_node}{a table with the first column as the phyto id given by Tree2GD and 
-the second column as the node id from \code{ape}.}
+\item{phyto}{the phyto id for the analysis.}
+
+\item{node}{a numeric indicating the target node id as in \code{ape}.
+An alternative arg of \code{phyto}.}
 
 \item{trees}{a list of objects of class "\code{phylo}".
 A list of gene trees to be examined. Can be unrooted.}
@@ -46,11 +51,15 @@ is set as percent (<= 1). Used as a cutoff for coverage as
 N tips as for deep nodes having large clades.}
 
 \item{up_one_node}{logical. Whether to choose tips of one node deeper as the 
-closest outgroup, as a second step of investigation. Default \code{FALSE}.}
+closest outgroup, as a second step of investigation. Defaults to \code{FALSE}.}
 
-\item{pdfwid}{the width of pdf file for subtrees. Default \code{10}.}
+\item{plot}{whether to plot subclades. Defaults to \code{FALSE}.}
 
-\item{pdflen}{the length of pdf file for subtrees. Default \code{30}.}
+\item{pdfwid}{the width of pdf file for subtrees. Defaults to \code{10}.}
+
+\item{pdflen}{the length of pdf file for subtrees. Defaults to \code{30}.}
+
+\item{mc.cores}{the number of cores used for mclapply. Defaults to \code{4}.}
 }
 \description{
 \code{filter_GD_by_coverage} is to identify for each gd whether the two 

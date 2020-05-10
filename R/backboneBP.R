@@ -172,7 +172,6 @@ backboneBP <- function(trees, taxa, level = NULL,
     names(s.bpinfo)<-names(goodtrees)
 
 
-
   s.bpinfo2 <- lapply(s.bpinfo, function(x) return(x$node.label[!is.na(x$node.label)]))
   # here the added "Root" and "" node.labels are set as NA , so is removed in the above line
   statl <- s.bpinfo2

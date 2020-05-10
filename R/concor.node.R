@@ -90,6 +90,7 @@ concor.node <- function(ref, trees, bp = 0, getTreeNames = FALSE, node = NULL){
 #' @importFrom methods hasArg
 #' @export
 
+
 .concor.node.unrooted <- function(ref, trees, bp = 0, getTreeNames = FALSE, node = NULL, warn = TRUE,
                                unresolve.ref = FALSE, unresolve.para = c(bp = NA, percent = 0.8),
                                from){

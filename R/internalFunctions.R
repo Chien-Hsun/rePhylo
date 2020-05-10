@@ -8,6 +8,7 @@
 #' @export
 #' @noRd
 #' @keywords internal
+#' 
 .compare.edge.len <- function(tree, subtips){
   bls <- numeric(length(subtips))
   for(j in 1:length(subtips)){
@@ -134,7 +135,7 @@
     wtips <- wtips[yy]; length(wtips) # remove those not in the trees (after drop.tip)
     # removing tips is mainly required by backboneBP ??
 
-    tree <- root.dist(z = tree, tar = wtips, bp = bp)
+    tree <- root_dist(z = tree, tar = wtips, bp = bp)
     # because wtips should be characters, so can use directly
     mrca <- ape::getMRCA(tree, tip = wtips); mrca
     res <- list(tree = tree, mrca = mrca)
@@ -366,13 +367,13 @@ select.backbone <- function(tre, mrcalist){
 #' @seealso \code{\link{concor.node}}, \code{\link{backboneBP}}, \code{\link{concor.trees}}
 
 # 2019.05.18
-# has implemented "root.dist" internal function to root test tree
+# has implemented "root_dist" internal function to root test tree
 .matchTips <- function(zz, refTips, setBP, reftips){
 
   # first root the test tree based on refTips
   isroot<-is.rooted(zz)
   if(!isroot){
-    zz <- root.dist(z = zz, tar = refTips)
+    zz <- root_dist(z = zz, tar = refTips)
   }
 
   if(is.null(zz)){
@@ -436,7 +437,7 @@ select.backbone <- function(tre, mrcalist){
   res <- data.frame(tn, record)
   # we have the node ID if there is matched tips, and c(0, 0) if there is no any matched clades
   # here "tn" is the node in the tree that rooted by the most distant tip
-  # using "root.dist" internal function
+  # using "root_dist" internal function
   # so will be different in different test trees
 
   return(res)
@@ -498,7 +499,7 @@ select.backbone <- function(tre, mrcalist){
 #' @keywords internal function
 #' @seealso \code{\link{cladeFilter}}, \code{\link{concor.node}}, \code{\link{backboneBP}}, \code{\link{concor.trees}}
 
-root.dist<-function(z, tar, bp = FALSE){
+root_dist<-function(z, tar, bp = FALSE){
   # z is the tree (one tree)
   # tar is the target in the "current" analysis (one point, one node)
   rt<-z
@@ -583,3 +584,34 @@ root.dist<-function(z, tar, bp = FALSE){
 }
 
 
+
+
+####################################################
+# to make ref table for phyto and ape node id
+#' @title generate node id table for the reference of phyto id and ape node id
+#' @description internal function
+#' @param tree the tree for making id table.
+#' @export
+#' @importFrom ape read.tree write.tree
+
+make.idTable.phyto <- 
+  function(tree){
+    
+    # prepare phyto id
+    nnode <- c(0, seq(tree$Nnode))
+    pp <- paste0("phyto_", nnode)
+    st <- ape::write.tree(tree)
+    st <- unlist(strsplit(st, split = ")", fixed = TRUE))
+    st <- lapply(c(1:length(st)), function(xx) 
+      paste0(st[[xx]], ")", pp[xx]))
+    st <- paste(unlist(st), collapse = "")
+    
+    tree <- ape::read.tree(text = st)
+    
+    # phyto_node is for the correspondance of phyto and ape id
+    phyto_tab <- cbind(c(tree[["tip.label"]], tree[["node.label"]]),
+                       1:(tree$Nnode + length(tree[["tip.label"]])))
+    
+    phyto_tab[ ,2] <- as.numeric(phyto_tab[ ,2])
+    return(phyto_tab)
+  }
